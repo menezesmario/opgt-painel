@@ -1,0 +1,1744 @@
+{
+  "metadata": {
+    "fonte": "iGPP/ESALQ - Malha Fundiária Brasil 2025",
+    "atualizacao": "2026-02-04",
+    "frequencia": "anual",
+    "nota": "Dados extraídos do GeoPackage iGPP. Transformado automaticamente.",
+    "ano_ref": 2025,
+    "disclaimer": "Os dados desta plataforma são de responsabilidade do iGPP/ESALQ e seguem a metodologia descrita na nota técnica. Os valores apresentados são estimativas baseadas em análises geoespaciais e podem divergir de outras fontes oficiais."
+  },
+  "brasil": {
+    "sigef": {
+      "area_ha": 265687013.31909996,
+      "num_parcelas": 33818
+    },
+    "snci": {
+      "area_ha": 0,
+      "num_poligonos": 0
+    },
+    "car": {
+      "area_cadastrada_ha": 230137521.2904,
+      "area_superficie_ha": 195616893.09684,
+      "num_imoveis": 36106
+    },
+    "areas_protegidas": {
+      "ti_homologada": {
+        "area_ha": 105024006.6484,
+        "quantidade": 2702
+      },
+      "uc_protecao_integral": {
+        "area_ha": 39666388.4443,
+        "quantidade": 5746
+      }
+    },
+    "terras_publicas": {
+      "glebas_publicas": {
+        "area_ha": 22312083.5511,
+        "quantidade": 8671
+      },
+      "fpnd": {
+        "area_ha": 46384193.417,
+        "quantidade": 3084
+      }
+    },
+    "quilombos": {
+      "titulados": {
+        "area_ha": 0,
+        "quantidade": 0
+      },
+      "nao_titulados": {
+        "area_ha": 1516596.9324,
+        "quantidade": 1894
+      }
+    },
+    "outras_areas": {
+      "urbanas": {
+        "area_ha": 4791139.621800001
+      },
+      "militares": {
+        "area_ha": 0,
+        "quantidade": 0
+      }
+    },
+    "sobreposicoes": {
+      "sigef_por_car": 0.75,
+      "car_por_sigef": 0.68,
+      "gp_por_car": 0.05,
+      "fpnd_por_car": 0.08,
+      "tih_por_car": 0.12,
+      "ucpi_por_car": 0.06
+    },
+    "area_total_brasil_ha": 851487600
+  },
+  "regioes": [],
+  "regioes_oficiais": [
+    {
+      "nome": "Norte",
+      "ufs": [
+        "AC",
+        "AM",
+        "AP",
+        "PA",
+        "RO",
+        "RR",
+        "TO"
+      ],
+      "sigef": {
+        "area_ha": 54776341.4495,
+        "num_parcelas": 3350
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 44818039.827199996,
+        "num_imoveis": 3059
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 93956608.05029999,
+          "quantidade": 1020
+        },
+        "uc_protecao_integral": {
+          "area_ha": 33462910.665999994,
+          "quantidade": 511
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 18079136.357,
+          "quantidade": 1973
+        },
+        "fpnd": {
+          "area_ha": 45303101.59280001,
+          "quantidade": 2174
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 423705.1187
+        }
+      }
+    },
+    {
+      "nome": "Nordeste",
+      "ufs": [
+        "AL",
+        "BA",
+        "CE",
+        "MA",
+        "PB",
+        "PE",
+        "PI",
+        "RN",
+        "SE"
+      ],
+      "sigef": {
+        "area_ha": 52563927.3335,
+        "num_parcelas": 12012
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 82982206.1467,
+        "num_imoveis": 12004
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 2337123.3351,
+          "quantidade": 555
+        },
+        "uc_protecao_integral": {
+          "area_ha": 2333470.4782999996,
+          "quantidade": 1394
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 1764595.7968,
+          "quantidade": 2862
+        },
+        "fpnd": {
+          "area_ha": 103580.7927,
+          "quantidade": 238
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 1161727.1674000002
+        }
+      }
+    },
+    {
+      "nome": "Centro-Oeste",
+      "ufs": [
+        "DF",
+        "GO",
+        "MS",
+        "MT"
+      ],
+      "sigef": {
+        "area_ha": 106768328.8054,
+        "num_parcelas": 3877
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 25056817.5008,
+        "num_imoveis": 3349
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 15104799.6285,
+          "quantidade": 715
+        },
+        "uc_protecao_integral": {
+          "area_ha": 1207396.7643000002,
+          "quantidade": 543
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 2329696.5623,
+          "quantidade": 1442
+        },
+        "fpnd": {
+          "area_ha": 977511.0315,
+          "quantidade": 672
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 493215.8093
+        }
+      }
+    },
+    {
+      "nome": "Sudeste",
+      "ufs": [
+        "ES",
+        "MG",
+        "RJ",
+        "SP"
+      ],
+      "sigef": {
+        "area_ha": 40723220.3541,
+        "num_parcelas": 12234
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 44661702.678,
+        "num_imoveis": 10780
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 187578.5032,
+          "quantidade": 322
+        },
+        "uc_protecao_integral": {
+          "area_ha": 1963644.1365,
+          "quantidade": 2301
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 85145.51659999999,
+          "quantidade": 1403
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 1747933.8523000001
+        }
+      }
+    },
+    {
+      "nome": "Sul",
+      "ufs": [
+        "PR",
+        "RS",
+        "SC"
+      ],
+      "sigef": {
+        "area_ha": 19809035.301200002,
+        "num_parcelas": 7031
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 32618755.137700003,
+        "num_imoveis": 6914
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 274102.6867,
+          "quantidade": 542
+        },
+        "uc_protecao_integral": {
+          "area_ha": 698966.3992,
+          "quantidade": 997
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 53509.31840000001,
+          "quantidade": 991
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 964557.6741
+        }
+      }
+    }
+  ],
+  "amazonia_legal": {
+    "nome": "Amazônia Legal",
+    "ufs": [
+      "AC",
+      "AM",
+      "AP",
+      "MA",
+      "MT",
+      "PA",
+      "RO",
+      "RR",
+      "TO"
+    ],
+    "sigef": {
+      "area_ha": 122815649.55930002,
+      "num_parcelas": 6502
+    },
+    "snci": {
+      "area_ha": 0,
+      "num_poligonos": 0
+    },
+    "car": {
+      "area_cadastrada_ha": 67766580.8702,
+      "num_imoveis": 5983
+    },
+    "areas_protegidas": {
+      "ti_homologada": {
+        "area_ha": 110201898.3934,
+        "quantidade": 1634
+      },
+      "uc_protecao_integral": {
+        "area_ha": 34825740.6311,
+        "quantidade": 781
+      }
+    },
+    "terras_publicas": {
+      "glebas_publicas": {
+        "area_ha": 21405149.3309,
+        "quantidade": 3539
+      },
+      "fpnd": {
+        "area_ha": 46374390.32020001,
+        "quantidade": 3068
+      }
+    },
+    "outras_areas": {
+      "urbanas": {
+        "area_ha": 720821.8195999999
+      }
+    }
+  },
+  "estados": [
+    {
+      "codigo_ibge": 12,
+      "uf": "AC",
+      "area_total_ha": 16422137,
+      "sigef": {
+        "area_ha": 3494938.3835999994,
+        "num_parcelas": 186
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 3294048.0837,
+        "area_superficie_ha": 2799940.8711449997,
+        "num_imoveis": 180
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 2440059.3645,
+          "quantidade": 77
+        },
+        "uc_protecao_integral": {
+          "area_ha": 1572263.6396000003,
+          "quantidade": 37
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 843832.3548,
+          "quantidade": 121
+        },
+        "fpnd": {
+          "area_ha": 648636.4313000002,
+          "quantidade": 86
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 22011.0952
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 1,
+        "car_por_sigef": 0.9425196447403258,
+        "gp_por_car": 0.25616880305286116,
+        "fpnd_por_car": 0.1969116463447088,
+        "tih_por_car": 0.7407479497868267,
+        "ucpi_por_car": 0.47730439861520607
+      }
+    },
+    {
+      "codigo_ibge": 27,
+      "uf": "AL",
+      "area_total_ha": 2777977,
+      "sigef": {
+        "area_ha": 578434.6965,
+        "num_parcelas": 697
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 1968951.9299,
+        "area_superficie_ha": 1673609.140415,
+        "num_imoveis": 690
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 18994.4952,
+          "quantidade": 65
+        },
+        "uc_protecao_integral": {
+          "area_ha": 16201.8039,
+          "quantidade": 123
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 10847.3654,
+          "quantidade": 114
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 60240.03600000001
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.2937779677177684,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.005509207835536605,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.009647008091743866,
+        "ucpi_por_car": 0.008228643703263424
+      }
+    },
+    {
+      "codigo_ibge": 13,
+      "uf": "AM",
+      "area_total_ha": 155932820,
+      "sigef": {
+        "area_ha": 10251692.7718,
+        "num_parcelas": 452
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 16309384.6686,
+        "area_superficie_ha": 13862976.96831,
+        "num_imoveis": 401
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 43953542.69739999,
+          "quantidade": 307
+        },
+        "uc_protecao_integral": {
+          "area_ha": 11252794.4794,
+          "quantidade": 119
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 3331049.7791999998,
+          "quantidade": 255
+        },
+        "fpnd": {
+          "area_ha": 35212195.7775,
+          "quantidade": 379
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 66627.7807
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.6285763062255375,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.2042412909429487,
+        "fpnd_por_car": 1,
+        "tih_por_car": 1,
+        "ucpi_por_car": 0.6899582484595319
+      }
+    },
+    {
+      "codigo_ibge": 16,
+      "uf": "AP",
+      "area_total_ha": 14281499,
+      "sigef": {
+        "area_ha": 667001.8461999999,
+        "num_parcelas": 104
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 508620.8844,
+        "area_superficie_ha": 432327.75174,
+        "num_imoveis": 116
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 1181712.3092000003,
+          "quantidade": 22
+        },
+        "uc_protecao_integral": {
+          "area_ha": 4657919.5629,
+          "quantidade": 38
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 971098.8441999998,
+          "quantidade": 95
+        },
+        "fpnd": {
+          "area_ha": 584406.8554,
+          "quantidade": 88
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 15500.5704
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 1,
+        "car_por_sigef": 0.7625479409055346,
+        "gp_por_car": 1,
+        "fpnd_por_car": 1,
+        "tih_por_car": 1,
+        "ucpi_por_car": 1
+      }
+    },
+    {
+      "codigo_ibge": 29,
+      "uf": "BA",
+      "area_total_ha": 56473419,
+      "sigef": {
+        "area_ha": 21563839.354199998,
+        "num_parcelas": 2973
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 30711779.652000003,
+        "area_superficie_ha": 26105012.704200003,
+        "num_imoveis": 2850
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 274507.1956999999,
+          "quantidade": 146
+        },
+        "uc_protecao_integral": {
+          "area_ha": 795476.6943999999,
+          "quantidade": 366
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 183189.06840000002,
+          "quantidade": 189
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 299748.1347
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.7021357797738603,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.0059647819330479745,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.008938172870816477,
+        "ucpi_por_car": 0.02590135457513929
+      }
+    },
+    {
+      "codigo_ibge": 23,
+      "uf": "CE",
+      "area_total_ha": 14890351,
+      "sigef": {
+        "area_ha": 2579458.8992999997,
+        "num_parcelas": 1096
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 10737946.3236,
+        "area_superficie_ha": 9127254.37506,
+        "num_imoveis": 1094
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 16866.9634,
+          "quantidade": 37
+        },
+        "uc_protecao_integral": {
+          "area_ha": 58719.5172,
+          "quantidade": 174
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 83168.9749,
+          "quantidade": 392
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 180127.6963
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.24021901596125797,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.0077453334551701135,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.0015707811244064023,
+        "ucpi_por_car": 0.005468412248527028
+      }
+    },
+    {
+      "codigo_ibge": 53,
+      "uf": "DF",
+      "area_total_ha": 577900,
+      "sigef": {
+        "area_ha": 240044.7345,
+        "num_parcelas": 17
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 184936.37669999996,
+        "area_superficie_ha": 157195.92019499996,
+        "num_imoveis": 7
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        },
+        "uc_protecao_integral": {
+          "area_ha": 43738.17650000001,
+          "quantidade": 5
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 35905.7877,
+          "quantidade": 6
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 59151.3251
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 1,
+        "car_por_sigef": 0.7704246339133923,
+        "gp_por_car": 0.1941521097184987,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.0,
+        "ucpi_por_car": 0.23650391167201892
+      }
+    },
+    {
+      "codigo_ibge": 32,
+      "uf": "ES",
+      "area_total_ha": 4609503,
+      "sigef": {
+        "area_ha": 1124478.1827,
+        "num_parcelas": 529
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 3176706.3363,
+        "area_superficie_ha": 2700200.385855,
+        "num_imoveis": 411
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 17795.6023,
+          "quantidade": 7
+        },
+        "uc_protecao_integral": {
+          "area_ha": 99797.40080000002,
+          "quantidade": 199
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 2421.0461,
+          "quantidade": 111
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 74290.8527
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.35397611981021565,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.0007621246170396289,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.005601903486214921,
+        "ucpi_por_car": 0.03141536869795679
+      }
+    },
+    {
+      "codigo_ibge": 52,
+      "uf": "GO",
+      "area_total_ha": 34008669,
+      "sigef": {
+        "area_ha": 22689510.0473,
+        "num_parcelas": 1647
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 8789644.2478,
+        "area_superficie_ha": 7471197.61063,
+        "num_imoveis": 1440
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 32641.149200000003,
+          "quantidade": 28
+        },
+        "uc_protecao_integral": {
+          "area_ha": 323385.221,
+          "quantidade": 216
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 99320.5823,
+          "quantidade": 312
+        },
+        "fpnd": {
+          "area_ha": 488.94089999999994,
+          "quantidade": 11
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 208915.31080000004
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 1,
+        "car_por_sigef": 0.38738801452638455,
+        "gp_por_car": 0.011299727213062053,
+        "fpnd_por_car": 5.562692712192296e-05,
+        "tih_por_car": 0.0037135916175640334,
+        "ucpi_por_car": 0.036791616575487865
+      }
+    },
+    {
+      "codigo_ibge": 21,
+      "uf": "MA",
+      "area_total_ha": 33193602,
+      "sigef": {
+        "area_ha": 13953393.6512,
+        "num_parcelas": 1691
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 10508429.6724,
+        "area_superficie_ha": 8932165.22154,
+        "num_imoveis": 1638
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 1801159.3203999996,
+          "quantidade": 156
+        },
+        "uc_protecao_integral": {
+          "area_ha": 642686.2061000001,
+          "quantidade": 95
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 1190756.7861,
+          "quantidade": 701
+        },
+        "fpnd": {
+          "area_ha": 94266.63680000001,
+          "quantidade": 233
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 161535.56780000002
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 1,
+        "car_por_sigef": 0.7531092388765416,
+        "gp_por_car": 0.11331443643073316,
+        "fpnd_por_car": 0.008970573124506684,
+        "tih_por_car": 0.1714013774228016,
+        "ucpi_por_car": 0.061159109984624205
+      }
+    },
+    {
+      "codigo_ibge": 31,
+      "uf": "MG",
+      "area_total_ha": 58652121,
+      "sigef": {
+        "area_ha": 26014455.319999997,
+        "num_parcelas": 5910
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 29385394.1183,
+        "area_superficie_ha": 24977585.000554997,
+        "num_imoveis": 5182
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 99878.25940000001,
+          "quantidade": 162
+        },
+        "uc_protecao_integral": {
+          "area_ha": 766006.4617999999,
+          "quantidade": 994
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 29649.2518,
+          "quantidade": 676
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 504827.3816
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.8852852275954086,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.0010089792119390253,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.0033989082806890106,
+        "ucpi_por_car": 0.026067591903521998
+      }
+    },
+    {
+      "codigo_ibge": 50,
+      "uf": "MS",
+      "area_total_ha": 35714561,
+      "sigef": {
+        "area_ha": 29752859.565,
+        "num_parcelas": 752
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 3642125.5057,
+        "area_superficie_ha": 3095806.679845,
+        "num_imoveis": 616
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 628027.4566,
+          "quantidade": 229
+        },
+        "uc_protecao_integral": {
+          "area_ha": 120129.60780000001,
+          "quantidade": 147
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 59214.004499999995,
+          "quantidade": 259
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 89568.0403
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 1,
+        "car_por_sigef": 0.12241262046571287,
+        "gp_por_car": 0.016258090065081197,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.17243432594981264,
+        "ucpi_por_car": 0.03298337951616295
+      }
+    },
+    {
+      "codigo_ibge": 51,
+      "uf": "MT",
+      "area_total_ha": 90336619,
+      "sigef": {
+        "area_ha": 54085914.4586,
+        "num_parcelas": 1461
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 12440111.3706,
+        "area_superficie_ha": 10574094.66501,
+        "num_imoveis": 1286
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 14444131.0227,
+          "quantidade": 458
+        },
+        "uc_protecao_integral": {
+          "area_ha": 720143.7590000001,
+          "quantidade": 175
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 2135256.1878,
+          "quantidade": 865
+        },
+        "fpnd": {
+          "area_ha": 977022.0906,
+          "quantidade": 661
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 135581.13309999998
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 1,
+        "car_por_sigef": 0.23000649050913743,
+        "gp_por_car": 0.17164285143349278,
+        "fpnd_por_car": 0.07853805014230167,
+        "tih_por_car": 1,
+        "ucpi_por_car": 0.057888851437611105
+      }
+    },
+    {
+      "codigo_ibge": 15,
+      "uf": "PA",
+      "area_total_ha": 124768951,
+      "sigef": {
+        "area_ha": 16747126.666900003,
+        "num_parcelas": 1000
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 17820732.3088,
+        "area_superficie_ha": 15147622.46248,
+        "num_imoveis": 978
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 28742712.071900003,
+          "quantidade": 315
+        },
+        "uc_protecao_integral": {
+          "area_ha": 12068642.370099999,
+          "quantidade": 113
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 6538509.7573,
+          "quantidade": 523
+        },
+        "fpnd": {
+          "area_ha": 4150096.0515999994,
+          "quantidade": 566
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 182120.2285
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.9397552455591377,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.3669046616042394,
+        "fpnd_por_car": 0.23288021949303694,
+        "tih_por_car": 1,
+        "ucpi_por_car": 0.677224827856284
+      }
+    },
+    {
+      "codigo_ibge": 25,
+      "uf": "PB",
+      "area_total_ha": 5646860,
+      "sigef": {
+        "area_ha": 1309816.9675,
+        "num_parcelas": 1275
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 3830468.8279999997,
+        "area_superficie_ha": 3255898.5037999996,
+        "num_imoveis": 1312
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 32931.50219999999,
+          "quantidade": 22
+        },
+        "uc_protecao_integral": {
+          "area_ha": 61214.81199999999,
+          "quantidade": 132
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 3956.8025000000002,
+          "quantidade": 103
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 73091.9186
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.3419469068447932,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.0010329812557346833,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.008597251062135517,
+        "ucpi_por_car": 0.015981023406986462
+      }
+    },
+    {
+      "codigo_ibge": 26,
+      "uf": "PE",
+      "area_total_ha": 9831107,
+      "sigef": {
+        "area_ha": 1351775.3987,
+        "num_parcelas": 1237
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 7186967.0747,
+        "area_superficie_ha": 6108922.013495,
+        "num_imoveis": 1269
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 186240.21649999995,
+          "quantidade": 122
+        },
+        "uc_protecao_integral": {
+          "area_ha": 189155.07900000003,
+          "quantidade": 238
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 19723.798399999996,
+          "quantidade": 257
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 154992.31139999998
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.18808704487580058,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.0027443841324155936,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.025913603689046265,
+        "ucpi_por_car": 0.026319179847904866
+      }
+    },
+    {
+      "codigo_ibge": 22,
+      "uf": "PI",
+      "area_total_ha": 25157747,
+      "sigef": {
+        "area_ha": 9429794.4921,
+        "num_parcelas": 1550
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 13413135.382499998,
+        "area_superficie_ha": 11401165.075124998,
+        "num_imoveis": 1553
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 2115.3931,
+          "quantidade": 4
+        },
+        "uc_protecao_integral": {
+          "area_ha": 547511.524,
+          "quantidade": 157
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 251788.1362,
+          "quantidade": 600
+        },
+        "fpnd": {
+          "area_ha": 9314.1559,
+          "quantidade": 5
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 98172.93710000001
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.7030268630854924,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.018771758356253214,
+        "fpnd_por_car": 0.0006944055684513628,
+        "tih_por_car": 0.00015771056055692502,
+        "ucpi_por_car": 0.040819055976601376
+      }
+    },
+    {
+      "codigo_ibge": 41,
+      "uf": "PR",
+      "area_total_ha": 19930792,
+      "sigef": {
+        "area_ha": 7985726.172100001,
+        "num_parcelas": 2414
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 10324897.3033,
+        "area_superficie_ha": 8776162.707805,
+        "num_imoveis": 2253
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 101624.53920000001,
+          "quantidade": 163
+        },
+        "uc_protecao_integral": {
+          "area_ha": 358542.1528,
+          "quantidade": 306
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 8664.5552,
+          "quantidade": 370
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 340747.1686
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.7734436418604993,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.0008391904486285468,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.00984266828179678,
+        "ucpi_por_car": 0.03472597763131302
+      }
+    },
+    {
+      "codigo_ibge": 33,
+      "uf": "RJ",
+      "area_total_ha": 4377505,
+      "sigef": {
+        "area_ha": 922682.7797000001,
+        "num_parcelas": 749
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 2642144.3751,
+        "area_superficie_ha": 2245822.718835,
+        "num_imoveis": 534
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 4787.5812000000005,
+          "quantidade": 16
+        },
+        "uc_protecao_integral": {
+          "area_ha": 344519.4746,
+          "quantidade": 401
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 4506.9854000000005,
+          "quantidade": 82
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 286506.7537
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.34921739644340155,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.0017058058758917822,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.0018120059013878832,
+        "ucpi_por_car": 0.1303938868166357
+      }
+    },
+    {
+      "codigo_ibge": 24,
+      "uf": "RN",
+      "area_total_ha": 5281135,
+      "sigef": {
+        "area_ha": 1366440.3129999998,
+        "num_parcelas": 977
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 3180512.2939,
+        "area_superficie_ha": 2703435.449815,
+        "num_imoveis": 1062
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        },
+        "uc_protecao_integral": {
+          "area_ha": 8917.410700000002,
+          "quantidade": 52
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 19822.7171,
+          "quantidade": 397
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 87253.42850000001
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.42962899895741224,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.006232554779938624,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.0,
+        "ucpi_por_car": 0.0028037655182477903
+      }
+    },
+    {
+      "codigo_ibge": 11,
+      "uf": "RO",
+      "area_total_ha": 23759075,
+      "sigef": {
+        "area_ha": 5085421.755100001,
+        "num_parcelas": 416
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 1325021.5734,
+        "area_superficie_ha": 1126268.33739,
+        "num_imoveis": 302
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 4790770.0806,
+          "quantidade": 162
+        },
+        "uc_protecao_integral": {
+          "area_ha": 2119330.2388999998,
+          "quantidade": 111
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 4425678.1688,
+          "quantidade": 322
+        },
+        "fpnd": {
+          "area_ha": 1665557.4280000003,
+          "quantidade": 310
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 55016.5306
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 1,
+        "car_por_sigef": 0.2605529368476036,
+        "gp_por_car": 1,
+        "fpnd_por_car": 1,
+        "tih_por_car": 1,
+        "ucpi_por_car": 1
+      }
+    },
+    {
+      "codigo_ibge": 14,
+      "uf": "RR",
+      "area_total_ha": 22429898,
+      "sigef": {
+        "area_ha": 2091021.9227,
+        "num_parcelas": 105
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 365366.1148,
+        "area_superficie_ha": 310561.19758,
+        "num_imoveis": 97
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 10293142.110900002,
+          "quantidade": 86
+        },
+        "uc_protecao_integral": {
+          "area_ha": 1328380.8657000002,
+          "quantidade": 21
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 1220256.727,
+          "quantidade": 96
+        },
+        "fpnd": {
+          "area_ha": 2338589.2849,
+          "quantidade": 84
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 23706.711699999996
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 1,
+        "car_por_sigef": 0.1747308867657526,
+        "gp_por_car": 1,
+        "fpnd_por_car": 1,
+        "tih_por_car": 1,
+        "ucpi_por_car": 1
+      }
+    },
+    {
+      "codigo_ibge": 43,
+      "uf": "RS",
+      "area_total_ha": 28173060,
+      "sigef": {
+        "area_ha": 9109279.312800001,
+        "num_parcelas": 2986
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 16236700.797600001,
+        "area_superficie_ha": 13801195.677960001,
+        "num_imoveis": 3135
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 109723.5474,
+          "quantidade": 227
+        },
+        "uc_protecao_integral": {
+          "area_ha": 127264.1618,
+          "quantidade": 295
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 38107.965800000005,
+          "quantidade": 397
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 366933.143
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.5610301887281481,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.0023470264233502944,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.006757748927431032,
+        "ucpi_por_car": 0.00783805548839154
+      }
+    },
+    {
+      "codigo_ibge": 42,
+      "uf": "SC",
+      "area_total_ha": 9573476,
+      "sigef": {
+        "area_ha": 2714029.8163,
+        "num_parcelas": 1631
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 6057157.0368,
+        "area_superficie_ha": 5148583.48128,
+        "num_imoveis": 1526
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 62754.6001,
+          "quantidade": 152
+        },
+        "uc_protecao_integral": {
+          "area_ha": 213160.0846,
+          "quantidade": 396
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 6736.7974,
+          "quantidade": 224
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 256877.3625
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.44806991131499935,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.0011122045142747455,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.010360405008279809,
+        "ucpi_por_car": 0.035191441018443965
+      }
+    },
+    {
+      "codigo_ibge": 28,
+      "uf": "SE",
+      "area_total_ha": 2191508,
+      "sigef": {
+        "area_ha": 430973.56100000005,
+        "num_parcelas": 516
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 1444014.9897,
+        "area_superficie_ha": 1227412.741245,
+        "num_imoveis": 536
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 4308.248600000001,
+          "quantidade": 3
+        },
+        "uc_protecao_integral": {
+          "area_ha": 13587.431,
+          "quantidade": 57
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 1342.1478000000002,
+          "quantidade": 109
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 46565.136999999995
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 0.2984550465709061,
+        "car_por_sigef": 1,
+        "gp_por_car": 0.000929455587077276,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.0029835206910802615,
+        "ucpi_por_car": 0.00940948057805331
+      }
+    },
+    {
+      "codigo_ibge": 35,
+      "uf": "SP",
+      "area_total_ha": 24821950,
+      "sigef": {
+        "area_ha": 12661604.0717,
+        "num_parcelas": 5046
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 9457457.8483,
+        "area_superficie_ha": 8038839.171055,
+        "num_imoveis": 4653
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 65117.0603,
+          "quantidade": 137
+        },
+        "uc_protecao_integral": {
+          "area_ha": 753320.7993000001,
+          "quantidade": 707
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 48568.23329999999,
+          "quantidade": 534
+        },
+        "fpnd": {
+          "area_ha": 0.0,
+          "quantidade": 0
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 882308.8643000001
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 1,
+        "car_por_sigef": 0.7469399449504508,
+        "gp_por_car": 0.005135442745719479,
+        "fpnd_por_car": 0.0,
+        "tih_por_car": 0.006885260430920656,
+        "ucpi_por_car": 0.07965362483063154
+      }
+    },
+    {
+      "codigo_ibge": 17,
+      "uf": "TO",
+      "area_total_ha": 27762090,
+      "sigef": {
+        "area_ha": 16439138.103199998,
+        "num_parcelas": 1087
+      },
+      "snci": {
+        "area_ha": 0,
+        "num_poligonos": 0
+      },
+      "car": {
+        "area_cadastrada_ha": 5194866.1935,
+        "area_superficie_ha": 4415636.264475,
+        "num_imoveis": 985
+      },
+      "areas_protegidas": {
+        "ti_homologada": {
+          "area_ha": 2554669.4157999996,
+          "quantidade": 51
+        },
+        "uc_protecao_integral": {
+          "area_ha": 463579.5094,
+          "quantidade": 72
+        }
+      },
+      "terras_publicas": {
+        "glebas_publicas": {
+          "area_ha": 748710.7257000001,
+          "quantidade": 561
+        },
+        "fpnd": {
+          "area_ha": 703619.7641,
+          "quantidade": 661
+        }
+      },
+      "outras_areas": {
+        "urbanas": {
+          "area_ha": 58722.2016
+        }
+      },
+      "sobreposicoes": {
+        "sigef_por_car": 1,
+        "car_por_sigef": 0.3160059950155648,
+        "gp_por_car": 0.14412512234421232,
+        "fpnd_por_car": 0.13544521415785338,
+        "tih_por_car": 0.4917680880782824,
+        "ucpi_por_car": 0.08923800770461557
+      }
+    }
+  ],
+  "municipios_sample": []
+}

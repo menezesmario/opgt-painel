@@ -1,0 +1,307 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import 'leaflet/dist/leaflet.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   OPGT - Global Styles
+   Based on Identity Guide
+   ============================================ */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply font-sans text-text bg-bg;
+  }
+
+  /* Typography defaults */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display text-text;
+  }
+
+  h1 {
+    @apply text-display-xl;
+  }
+
+  h2 {
+    @apply text-display-lg;
+  }
+
+  h3 {
+    @apply text-display-md;
+  }
+
+  h4 {
+    @apply text-display-sm;
+  }
+
+  p {
+    @apply text-body-md text-text-secondary;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  /* Focus states for accessibility */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+}
+
+@layer components {
+  /* Container */
+  .container-opgt {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Section spacing */
+  .section-padding {
+    @apply py-16 md:py-24;
+  }
+
+  /* Cards */
+  .card-opgt {
+    @apply bg-white border border-border rounded-lg p-6
+           transition-all duration-300 ease-out;
+  }
+
+  .card-opgt-hover {
+    @apply card-opgt cursor-pointer
+           hover:shadow-card-hover hover:border-primary hover:-translate-y-1;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply inline-flex items-center justify-center
+           px-6 py-3 rounded-md font-medium
+           bg-primary text-white
+           hover:bg-primary-dark
+           transition-all duration-200
+           hover:-translate-y-0.5 hover:shadow-medium;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center
+           px-6 py-3 rounded-md font-medium
+           bg-secondary text-white
+           hover:bg-secondary-dark
+           transition-all duration-200
+           hover:-translate-y-0.5 hover:shadow-medium;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center
+           px-6 py-3 rounded-md font-medium
+           border-2 border-primary text-primary bg-transparent
+           hover:bg-primary hover:text-white
+           transition-all duration-200;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center
+           px-6 py-3 rounded-md font-medium
+           text-primary bg-transparent
+           hover:bg-bg-alt
+           transition-all duration-200;
+  }
+
+  /* Tags */
+  .tag-opgt {
+    @apply inline-block px-3 py-1.5
+           text-caption font-semibold uppercase tracking-wider
+           rounded-sm;
+  }
+
+  .tag-primary {
+    @apply tag-opgt bg-primary text-white;
+  }
+
+  .tag-secondary {
+    @apply tag-opgt bg-secondary text-white;
+  }
+
+  .tag-outline {
+    @apply tag-opgt border border-primary text-primary bg-transparent;
+  }
+
+  /* Section headers */
+  .section-label {
+    @apply tag-opgt bg-primary/10 text-primary mb-4;
+  }
+
+  .section-title {
+    @apply text-display-lg text-text mb-4;
+  }
+
+  .section-description {
+    @apply text-body-lg text-text-secondary max-w-3xl;
+  }
+
+  /* Links */
+  .link-primary {
+    @apply text-primary hover:text-primary-dark underline-offset-4 hover:underline;
+  }
+
+  .link-terra {
+    @apply text-secondary hover:text-secondary-dark underline-offset-4 hover:underline;
+  }
+
+  /* Icon containers */
+  .icon-box {
+    @apply w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary;
+  }
+
+  .icon-box-terra {
+    @apply w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary;
+  }
+}
+
+@layer utilities {
+  /* Text balance for headings */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-gradient-brand bg-clip-text text-transparent;
+  }
+
+  /* Custom scrollbar */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.border.DEFAULT') transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-border-dark;
+  }
+
+  /* Aspect ratios */
+  .aspect-card {
+    aspect-ratio: 4 / 3;
+  }
+
+  .aspect-banner {
+    aspect-ratio: 21 / 9;
+  }
+}
+
+/* Animation keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInScale {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInUpBounce {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-slide-in-scale {
+  animation: slideInScale 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in-up-bounce {
+  animation: fadeInUpBounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Selection colors */
+::selection {
+  @apply bg-primary/20 text-text;
+}
