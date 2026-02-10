@@ -1,7 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/((?!api/).*)",
+      "source": "/geoserver/:path*",
+      "destination": "https://opgt-geoserver-deploy-production.up.railway.app/geoserver/:path*"
+    },
+    {
+      "source": "/((?!geoserver/).*)",
       "destination": "/index.html"
     }
   ]

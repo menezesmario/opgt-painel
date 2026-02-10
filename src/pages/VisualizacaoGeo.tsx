@@ -12,6 +12,7 @@ import {
   CATEGORIA_FUNDIARIA_COLORS,
   CATEGORIA_FUNDIARIA_LABELS,
 } from '../config/geoserver';
+import { REGIOES, ESTADOS, getEstadosByRegiao, buildEstadoCqlFilter } from '../data/estados';
 
 // Lazy loading do mapa WMS (componente pesado com Leaflet)
 const WmsMap = lazy(() => import('../components/map/WmsMap'));
@@ -23,12 +24,19 @@ const WmsMap = lazy(() => import('../components/map/WmsMap'));
 const VisualizacaoGeo: React.FC = () => {
   const [selectedBiomas, setSelectedBiomas] = useState<string[]>([]);
   const [selectedCategoria, setSelectedCategoria] = useState<string>('');
+  const [selectedRegiao, setSelectedRegiao] = useState<string>('');
+  const [selectedEstado, setSelectedEstado] = useState<string>('');
   const [clickedFeature, setClickedFeature] = useState<Record<string, unknown> | null>(null);
 
   const formatHa = (v: number) =>
     new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(v) + ' ha';
   const formatNum = (v: number) =>
     new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(v);
+
+  // Estados disponíveis com base na região selecionada
+  const estadosDisponiveis = selectedRegiao
+    ? getEstadosByRegiao(selectedRegiao)
+    : ESTADOS;
 
   // Constrói o filtro CQL baseado na seleção
   const buildCqlFilter = (): string | null => {
@@ -39,6 +47,15 @@ const VisualizacaoGeo: React.FC = () => {
     }
     if (selectedCategoria) {
       parts.push(`categoria_fundiaria_v2025 = '${selectedCategoria}'`);
+    }
+    // Filtro por estado específico ou por todos os estados da região
+    if (selectedEstado) {
+      const estadoFilter = buildEstadoCqlFilter([selectedEstado]);
+      if (estadoFilter) parts.push(estadoFilter);
+    } else if (selectedRegiao) {
+      const codigosRegiao = getEstadosByRegiao(selectedRegiao).map((e) => e.codigoIBGE);
+      const regiaoFilter = buildEstadoCqlFilter(codigosRegiao);
+      if (regiaoFilter) parts.push(regiaoFilter);
     }
     return parts.length > 0 ? parts.join(' AND ') : null;
   };
@@ -53,13 +70,20 @@ const VisualizacaoGeo: React.FC = () => {
     setSelectedCategoria(cat);
   };
 
+  const handleRegiaoChange = (regiao: string) => {
+    setSelectedRegiao(regiao);
+    setSelectedEstado(''); // reset estado ao mudar região
+  };
+
   const clearFilters = () => {
     setSelectedBiomas([]);
     setSelectedCategoria('');
+    setSelectedRegiao('');
+    setSelectedEstado('');
     setClickedFeature(null);
   };
 
-  const hasFilters = selectedBiomas.length > 0 || !!selectedCategoria;
+  const hasFilters = selectedBiomas.length > 0 || !!selectedCategoria || !!selectedRegiao || !!selectedEstado;
   const cqlFilter = buildCqlFilter();
 
   return (
@@ -177,12 +201,41 @@ const VisualizacaoGeo: React.FC = () => {
                   ))}
                 </select>
               </Card>
+
+              {/* Filtro por Região e Estado */}
+              <Card variant="elevated">
+                <h3 className="text-body-md font-semibold text-text mb-3">Região / Estado</h3>
+                <div className="space-y-3">
+                  <select
+                    value={selectedRegiao}
+                    onChange={(e) => handleRegiaoChange(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-white text-body-sm text-text focus:outline-none focus:border-primary transition-colors"
+                  >
+                    <option value="">Todas as regiões</option>
+                    {REGIOES.map((r) => (
+                      <option key={r} value={r}>{r}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={selectedEstado}
+                    onChange={(e) => setSelectedEstado(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-white text-body-sm text-text focus:outline-none focus:border-primary transition-colors"
+                  >
+                    <option value="">Todos os estados</option>
+                    {estadosDisponiveis.map((e) => (
+                      <option key={e.uf} value={e.codigoIBGE}>
+                        {e.uf} — {e.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </Card>
             </div>
 
-            {/* Mapa Principal */}
-            <div className="lg:col-span-6">
+            {/* Mapa Principal — ocupa espaço restante */}
+            <div className="lg:col-span-9">
               <Card variant="elevated" className="p-4">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-3">
                   <div>
                     <h3 className="text-display-sm text-text">Malha Fundiária 2025</h3>
                     <p className="text-body-sm text-text-secondary">
@@ -193,100 +246,63 @@ const VisualizacaoGeo: React.FC = () => {
                     <Tag variant="primary" className="text-xs">Filtro ativo</Tag>
                   )}
                 </div>
-                <ErrorBoundary fallback={<div className="h-[500px] flex items-center justify-center text-text-muted">Erro ao carregar mapa</div>}>
-                  <Suspense fallback={<Skeleton variant="map" className="h-[500px]" />}>
+                <ErrorBoundary fallback={<div className="h-[70vh] flex items-center justify-center text-text-muted">Erro ao carregar mapa</div>}>
+                  <Suspense fallback={<Skeleton variant="map" className="h-[70vh]" />}>
                     <WmsMap
                       cqlFilter={cqlFilter}
                       onFeatureClick={setClickedFeature}
-                      minHeight="500px"
+                      minHeight="70vh"
                     />
                   </Suspense>
                 </ErrorBoundary>
-              </Card>
-            </div>
 
-            {/* Sidebar Direita — Detalhes */}
-            <div className="lg:col-span-3 space-y-4">
-              <Card variant="elevated">
-                <h3 className="text-body-md font-semibold text-text mb-4">Detalhes do Polígono</h3>
-                {clickedFeature ? (
-                  <div className="space-y-4">
-                    {clickedFeature.bioma != null && (
-                      <div>
-                        <div className="text-body-xs text-text-muted uppercase">Bioma</div>
-                        <div className="flex items-center gap-2 mt-1">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: BIOMA_COLORS[String(clickedFeature.bioma)] || '#999' }} />
-                          <span className="text-body-md font-medium text-text">{String(clickedFeature.bioma)}</span>
-                        </div>
-                      </div>
-                    )}
-                    {clickedFeature.categoria_fundiaria_v2025 != null && (() => {
-                      const cat = String(clickedFeature.categoria_fundiaria_v2025);
-                      return (
+                {/* Detalhes do polígono clicado — abaixo do mapa */}
+                {clickedFeature && (
+                  <div className="mt-4 p-4 bg-bg-alt rounded-lg border border-border">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-body-md font-semibold text-text">Detalhes do Polígono</h4>
+                      <button onClick={() => setClickedFeature(null)} className="text-body-xs text-text-muted hover:text-text">Fechar</button>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {clickedFeature.bioma != null && (
                         <div>
-                          <div className="text-body-xs text-text-muted uppercase">Categoria Fundiária</div>
+                          <div className="text-body-xs text-text-muted uppercase">Bioma</div>
                           <div className="flex items-center gap-2 mt-1">
-                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CATEGORIA_FUNDIARIA_COLORS[cat] || '#999' }} />
-                            <div>
-                              <span className="text-body-md font-semibold text-text">{cat}</span>
-                              <div className="text-body-xs text-text-secondary">
-                                {CATEGORIA_FUNDIARIA_LABELS[cat] || ''}
-                              </div>
-                            </div>
+                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: BIOMA_COLORS[String(clickedFeature.bioma)] || '#999' }} />
+                            <span className="text-body-sm font-medium text-text">{String(clickedFeature.bioma)}</span>
                           </div>
                         </div>
-                      );
-                    })()}
-                    {clickedFeature.categoria_declaratoria_v2025 != null && (
-                      <div>
-                        <div className="text-body-xs text-text-muted uppercase">Cat. Declaratória</div>
-                        <div className="text-body-md text-text mt-1">{String(clickedFeature.categoria_declaratoria_v2025)}</div>
-                      </div>
-                    )}
-                    {clickedFeature.cd_mun != null && (
-                      <div>
-                        <div className="text-body-xs text-text-muted uppercase">Cód. Município</div>
-                        <div className="text-body-md text-text mt-1">{String(clickedFeature.cd_mun)}</div>
-                      </div>
-                    )}
-                    {clickedFeature.area_ha != null && (
-                      <div className="pt-3 border-t border-border">
-                        <div className="text-body-xs text-text-muted uppercase">Área</div>
-                        <div className="text-display-sm font-semibold text-primary mt-1">
-                          {formatHa(Number(clickedFeature.area_ha))}
+                      )}
+                      {clickedFeature.categoria_fundiaria_v2025 != null && (() => {
+                        const cat = String(clickedFeature.categoria_fundiaria_v2025);
+                        return (
+                          <div>
+                            <div className="text-body-xs text-text-muted uppercase">Cat. Fundiária</div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: CATEGORIA_FUNDIARIA_COLORS[cat] || '#999' }} />
+                              <span className="text-body-sm font-medium text-text">{cat} — {CATEGORIA_FUNDIARIA_LABELS[cat] || ''}</span>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                      {clickedFeature.cd_mun != null && (
+                        <div>
+                          <div className="text-body-xs text-text-muted uppercase">Cód. Município</div>
+                          <div className="text-body-sm text-text mt-1">{String(clickedFeature.cd_mun)}</div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-primary/10 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                      </svg>
+                      )}
+                      {clickedFeature.area_ha != null && (
+                        <div>
+                          <div className="text-body-xs text-text-muted uppercase">Área</div>
+                          <div className="text-body-sm font-semibold text-primary mt-1">{formatHa(Number(clickedFeature.area_ha))}</div>
+                        </div>
+                      )}
                     </div>
-                    <p className="text-body-sm text-text-secondary">Clique em um polígono no mapa para ver os detalhes</p>
                   </div>
                 )}
               </Card>
-
-              {/* Legenda biomas */}
-              <Card variant="elevated">
-                <h3 className="text-body-md font-semibold text-text mb-3">Biomas</h3>
-                <div className="space-y-2">
-                  {MALHA_STATS.por_bioma.map((item) => (
-                    <div key={item.bioma} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: BIOMA_COLORS[item.bioma] || '#999' }} />
-                        <span className="text-body-sm text-text">{item.bioma}</span>
-                      </div>
-                      <span className="text-body-xs text-text-muted">{(item.area_ha / 1_000_000).toFixed(0)}M ha</span>
-                    </div>
-                  ))}
-                </div>
-              </Card>
             </div>
+
           </div>
 
           {/* Link para Dashboard */}

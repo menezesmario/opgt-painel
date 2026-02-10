@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, useMapEvents, Popup, useMap } from 'react-leaf
 import L from 'leaflet';
 import {
   WMS_URL,
+  WMS_TILES_URL,
   GEOSERVER_LAYERS,
   BRAZIL_CENTER,
   BRAZIL_ZOOM,
@@ -20,7 +21,7 @@ L.Icon.Default.mergeOptions({
 });
 
 /** Zoom mínimo para carregar a camada WMS (evita OOM com 174k polígonos) */
-const MIN_WMS_ZOOM = 6;
+const MIN_WMS_ZOOM = 5;
 
 /**
  * Componente WMS que usa L.tileLayer.wms diretamente.
@@ -69,7 +70,7 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
       params.CQL_FILTER = cqlFilter;
     }
 
-    const wmsLayer = L.tileLayer.wms(WMS_URL, params);
+    const wmsLayer = L.tileLayer.wms(WMS_TILES_URL, params);
 
     // Tracking de loading
     pendingTilesRef.current = 0;
@@ -286,9 +287,9 @@ const WmsMap: React.FC<WmsMapProps> = ({
       >
         <MapResizer />
 
-        {/* Base tiles — CartoDB Positron (clean, light style) */}
+        {/* Base tiles — CartoDB Voyager (fronteiras e labels mais visíveis) */}
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
         />
 

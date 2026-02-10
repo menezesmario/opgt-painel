@@ -3,8 +3,16 @@
  * Dados servidos via WMS/WFS do PostGIS (174.723 polígonos da Malha Fundiária 2025)
  */
 
-export const GEOSERVER_BASE = 'https://opgt-geoserver-deploy-production.up.railway.app/geoserver';
+const GEOSERVER_DIRECT = 'https://opgt-geoserver-deploy-production.up.railway.app/geoserver';
 
+// Proxy via Vercel (evita CORS para fetch/GetFeatureInfo)
+// Em dev, acessa GeoServer diretamente
+export const GEOSERVER_BASE = import.meta.env.DEV ? GEOSERVER_DIRECT : '/geoserver';
+
+// URL direta para tiles WMS (carregados via <img>, não precisa de CORS)
+export const WMS_TILES_URL = `${GEOSERVER_DIRECT}/opgt/wms`;
+
+// URL para fetch (GetFeatureInfo, WFS) — usa proxy em prod
 export const WMS_URL = `${GEOSERVER_BASE}/opgt/wms`;
 export const WFS_URL = `${GEOSERVER_BASE}/opgt/wfs`;
 
