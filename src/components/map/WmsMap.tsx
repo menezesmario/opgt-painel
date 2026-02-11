@@ -48,10 +48,16 @@ const GRADUAL_LAYER_DELAY_MS = 2000;
 function WmsLayer({
   cqlFilter,
   showLoadingIndicator = true,
+  layerId,
+  onLoadingChange,
 }: {
   cqlFilter?: string | null;
   /** Quando false, não exibe spinner/erro (útil no carregamento gradual). */
   showLoadingIndicator?: boolean;
+  /** Identificador da camada; usado com onLoadingChange para reportar carregamento ao pai. */
+  layerId?: string;
+  /** Chamado quando o estado de carregamento dos tiles muda (para agregar no pai). */
+  onLoadingChange?: (id: string, loading: boolean) => void;
 }) {
   const map = useMap();
   const layerRef = useRef<L.TileLayer.WMS | null>(null);
@@ -131,6 +137,7 @@ function WmsLayer({
 
     if (!isVisible) {
       setLoading(false);
+      if (layerId) onLoadingChange?.(layerId, false);
       return;
     }
 
@@ -172,6 +179,7 @@ function WmsLayer({
       pendingTilesRef.current++;
       tilesStartedRef.current++;
       setLoading(true);
+      if (layerId) onLoadingChange?.(layerId, true);
       if (!timeoutRef.current) {
         timeoutRef.current = setTimeout(() => {
           timeoutRef.current = null;
@@ -188,6 +196,7 @@ function WmsLayer({
         autoRetriesUsedRef.current = 0;
         clearLoadingTimeout();
         setLoading(false);
+        if (layerId) onLoadingChange?.(layerId, false);
       }
     });
 
@@ -198,6 +207,7 @@ function WmsLayer({
       if (pendingTilesRef.current === 0) {
         clearLoadingTimeout();
         setLoading(false);
+        if (layerId) onLoadingChange?.(layerId, false);
       }
     });
 
@@ -206,6 +216,7 @@ function WmsLayer({
       autoRetriesUsedRef.current = 0;
       clearLoadingTimeout();
       setLoading(false);
+      if (layerId) onLoadingChange?.(layerId, false);
     });
 
     wmsLayer.addTo(map);
@@ -219,8 +230,9 @@ function WmsLayer({
         layerRef.current = null;
       }
       setLoading(false);
+      if (layerId) onLoadingChange?.(layerId, false);
     };
-  }, [map, cqlFilter, isVisible, retryCount, clearLoadingTimeout, clearAutoRetryTimeout, setErrorOrAutoRetry]);
+  }, [map, cqlFilter, isVisible, retryCount, layerId, onLoadingChange, clearLoadingTimeout, clearAutoRetryTimeout, setErrorOrAutoRetry]);
 
   const handleRetry = useCallback(() => {
     autoRetriesUsedRef.current = 0;
@@ -254,7 +266,7 @@ function WmsLayer({
     );
   }
 
-  // Estado de erro (timeout ou muitos tiles falharam)
+  // Estado de erro (timeout ou muitos tiles falharam) — só exibe quando não está em modo gradual (evita sobreposição)
   if (error && showLoadingIndicator) {
     return (
       <div
@@ -266,22 +278,24 @@ function WmsLayer({
           background: 'rgba(255,255,255,0.92)',
           padding: '10px 14px',
           borderRadius: 6,
-          fontSize: '12px',
           fontWeight: 500,
           color: '#333',
           boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
           maxWidth: 280,
         }}
       >
-        <p style={{ margin: 0, marginBottom: 8 }}>
-          Não foi possível carregar a camada. O servidor pode estar indisponível.
+        <p style={{ margin: 0, marginBottom: 6, fontSize: '11px', lineHeight: 1.4 }}>
+          Não foi possível carregar a camada no momento. O servidor pode estar sobrecarregado ou temporariamente indisponível.
+        </p>
+        <p style={{ margin: 0, marginBottom: 8, fontSize: '10px', color: '#6b7280', lineHeight: 1.4 }}>
+          Recomendamos selecionar região, estado ou camada nos filtros para melhor desempenho.
         </p>
         <button
           type="button"
           onClick={handleRetry}
           style={{
-            padding: '6px 12px',
-            fontSize: '12px',
+            padding: '5px 10px',
+            fontSize: '11px',
             fontWeight: 600,
             color: '#fff',
             background: '#2d6a4f',
@@ -296,8 +310,8 @@ function WmsLayer({
     );
   }
 
-  // Tentativa automática em andamento
-  if (isAutoRetrying) {
+  // Tentativa automática em andamento — só exibe quando não está em modo gradual (evita sobreposição com card "Carregando camadas")
+  if (isAutoRetrying && showLoadingIndicator) {
     const sec = retryInSeconds ?? Math.ceil(AUTO_RETRY_DELAY_MS / 1000);
     return (
       <div
@@ -306,16 +320,32 @@ function WmsLayer({
           top: 12,
           right: 12,
           zIndex: 1000,
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 10,
           background: 'rgba(255,255,255,0.92)',
-          padding: '8px 14px',
+          padding: '10px 14px',
           borderRadius: 6,
-          fontSize: '12px',
           fontWeight: 500,
           color: '#333',
           boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+          maxWidth: 300,
         }}
       >
-        Camada indisponível. Tentando novamente em {sec} s…
+        <span
+          className="flex-shrink-0 w-4 h-4 rounded-full border-2 border-primary/20 border-t-primary mt-0.5"
+          style={{ animation: 'wms-gradual-spin 0.7s linear infinite' }}
+          aria-hidden
+        />
+        <div>
+          <p style={{ margin: 0, marginBottom: 4, fontSize: '11px', lineHeight: 1.4 }}>
+            O carregamento está demorando. Nova tentativa automática em {sec} s.
+          </p>
+          <p style={{ margin: 0, fontSize: '10px', color: '#6b7280', lineHeight: 1.4 }}>
+            Recomendamos selecionar região, estado ou camada nos filtros para melhor desempenho.
+          </p>
+        </div>
+        <style>{`@keyframes wms-gradual-spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
@@ -445,11 +475,16 @@ function MapResizer() {
 
 /**
  * Monta uma WmsLayer por categoria, com atraso entre cada uma, para não sobrecarregar o GeoServer.
- * Usado para "todas as categorias": com escopo (região/estado) ou Brasil inteiro (scopeOnlyCql null).
+ * O card de status permanece com spinner até as camadas visíveis terminarem de carregar os tiles.
  */
 function GradualWmsLayers({ scopeOnlyCql }: { scopeOnlyCql: string | null }) {
   const total = CATEGORIA_FUNDIARIA_GRADUAL_ORDER.length;
   const [visibleCount, setVisibleCount] = useState(1); // primeira categoria já visível
+  const [loadingByLayer, setLoadingByLayer] = useState<Record<string, boolean>>({});
+
+  const onLoadingChange = useCallback((id: string, loading: boolean) => {
+    setLoadingByLayer((prev) => (prev[id] === loading ? prev : { ...prev, [id]: loading }));
+  }, []);
 
   useEffect(() => {
     if (visibleCount >= total) return;
@@ -460,39 +495,53 @@ function GradualWmsLayers({ scopeOnlyCql }: { scopeOnlyCql: string | null }) {
     return () => clearTimeout(t);
   }, [visibleCount, total]);
 
+  const visibleCats = CATEGORIA_FUNDIARIA_GRADUAL_ORDER.slice(0, visibleCount);
+  const anyVisibleLoading = visibleCats.some((cat) => loadingByLayer[cat] !== false);
+  const showCard = visibleCount < total || anyVisibleLoading;
+
   return (
     <>
-      {CATEGORIA_FUNDIARIA_GRADUAL_ORDER.slice(0, visibleCount).map((cat) => {
+      {visibleCats.map((cat) => {
         const cql = scopeOnlyCql
           ? `${scopeOnlyCql} AND categoria_fundiaria_v2025 = '${cat}'`
           : `categoria_fundiaria_v2025 = '${cat}'`;
         return (
           <WmsLayer
             key={cat}
+            layerId={cat}
             cqlFilter={cql}
             showLoadingIndicator={false}
+            onLoadingChange={onLoadingChange}
           />
         );
       })}
-      {visibleCount < total && (
+      {showCard && (
         <div
-          className="flex items-center gap-3 py-2 pl-3 pr-4 rounded-lg border border-border border-l-4 border-l-primary bg-white/95 text-body-sm font-medium text-text"
+          className="flex items-start gap-3 py-2 pl-3 pr-4 rounded-lg border border-border border-l-4 border-l-primary bg-white/95 font-medium text-text"
           style={{
             position: 'absolute',
             top: 12,
             right: 12,
             zIndex: 1000,
+            fontSize: '11px',
+            lineHeight: 1.4,
             boxShadow: '0 2px 8px rgba(61, 90, 69, 0.08), 0 1px 2px rgba(0,0,0,0.04)',
+            maxWidth: 280,
           }}
         >
           <span
-            className="flex-shrink-0 w-4 h-4 rounded-full border-2 border-primary/20 border-t-primary"
+            className="flex-shrink-0 w-4 h-4 rounded-full border-2 border-primary/20 border-t-primary mt-0.5"
             style={{ animation: 'wms-gradual-spin 0.7s linear infinite' }}
             aria-hidden
           />
-          <span>
-            Carregando camadas ({visibleCount}/{total})…
-          </span>
+          <div>
+            <p style={{ margin: 0, marginBottom: 4, fontSize: '10px', lineHeight: 1.4 }}>
+              Carregando camadas ({visibleCount}/{total})…
+            </p>
+            <p style={{ margin: 0, fontSize: '10px', color: '#6b7280', lineHeight: 1.4 }}>
+              Use região, estado ou camada nos filtros para otimizar o carregamento.
+            </p>
+          </div>
           <style>{`@keyframes wms-gradual-spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       )}
