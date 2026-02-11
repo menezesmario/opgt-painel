@@ -1,4 +1,4 @@
-import React, { useMemo, useState, lazy, Suspense } from 'react';
+import React, { useMemo, useState, useRef, useEffect, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Bar,
@@ -56,6 +56,23 @@ const Dashboard: React.FC = () => {
 
   // Hook de filtros geoespaciais (para a aba Mapa Fundiário)
   const geo = useGeoFilters();
+  const cardFiltrosMapaRef = useRef<HTMLDivElement>(null);
+  const prevFiltrosRef = useRef({ regiao: '', estado: '', biomas: [] as string[], categoria: '' });
+
+  // Ao aplicar filtro (região, estado ou camadas), scroll para o topo do card de filtros
+  useEffect(() => {
+    if (activeTab !== 'mapa-fundiario') return;
+    const { selectedRegiao, selectedEstado, selectedBiomas, selectedCategoria } = geo.state;
+    const prev = prevFiltrosRef.current;
+    const regiaoMudou = prev.regiao !== selectedRegiao;
+    const estadoMudou = prev.estado !== selectedEstado;
+    const biomasMudou = prev.biomas.length !== selectedBiomas.length || prev.biomas.some((b, i) => b !== selectedBiomas[i]);
+    const categoriaMudou = prev.categoria !== selectedCategoria;
+    prevFiltrosRef.current = { regiao: selectedRegiao, estado: selectedEstado, biomas: [...selectedBiomas], categoria: selectedCategoria ?? '' };
+    if (regiaoMudou || estadoMudou || biomasMudou || categoriaMudou) {
+      cardFiltrosMapaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [activeTab, geo.state.selectedRegiao, geo.state.selectedEstado, geo.state.selectedBiomas, geo.state.selectedCategoria]);
 
   const tabs: Array<{ id: TabId; label: string; icon?: string }> = [
     { id: 'landing', label: 'Visão Geral' },
@@ -265,7 +282,10 @@ const Dashboard: React.FC = () => {
           {activeTab === 'mapa-fundiario' && (
             <div className="space-y-0">
               {/* Card: Filtros (Scope Bar) + Resumo (Summary Strip) — cantos arredondados e margem antes do mapa */}
-              <div className="rounded-2xl overflow-hidden border border-border bg-white shadow-lg mb-6">
+              <div
+                ref={cardFiltrosMapaRef}
+                className="rounded-2xl overflow-hidden border border-border bg-white shadow-lg mb-6 scroll-mt-[6.5rem]"
+              >
                 <ScopeBar
                   selectedRegiao={geo.state.selectedRegiao}
                   selectedEstado={geo.state.selectedEstado}
