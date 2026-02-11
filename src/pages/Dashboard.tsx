@@ -16,7 +16,6 @@ import Disclaimer from '../components/ui/Disclaimer';
 import Skeleton from '../components/ui/Skeleton';
 import ErrorBoundary from '../components/ErrorBoundary';
 import ScopeBar from '../components/geo/ScopeBar';
-import SummaryStrip from '../components/geo/SummaryStrip';
 import FilterDrawer from '../components/geo/FilterDrawer';
 import ActiveFilterChips from '../components/geo/ActiveFilterChips';
 import { useGeoFilters } from '../hooks/useGeoFilters';
@@ -265,29 +264,66 @@ const Dashboard: React.FC = () => {
           {/* Mapa Fundiário — renderizado fora do card branco (precisa de full-width interno) */}
           {activeTab === 'mapa-fundiario' && (
             <div className="space-y-0">
-              {/* Scope Bar */}
-              <ScopeBar
-                selectedRegiao={geo.state.selectedRegiao}
-                selectedEstado={geo.state.selectedEstado}
-                onRegiaoChange={(regiao) => geo.dispatch({ type: 'SET_REGIAO', regiao })}
-                onEstadoChange={(estado) => geo.dispatch({ type: 'SET_ESTADO', estado })}
-                onResetToBrasil={() => geo.dispatch({ type: 'RESET_TO_BRASIL' })}
-                onOpenDrawer={() => geo.dispatch({ type: 'TOGGLE_DRAWER' })}
-                activeFilterCount={geo.activeFilterCount}
-              />
-
-              {/* Summary Strip */}
-              <SummaryStrip
-                scopeLabel={geo.scopeLabel}
-                scopeSublabel={geo.scopeSublabel}
-                registros={MALHA_STATS.total.registros}
-                area_ha={MALHA_STATS.total.area_ha}
-                biomaCount={MALHA_STATS.por_bioma.length}
-                categoriaCount={MALHA_STATS.por_categoria.length}
-              />
+              {/* Card: Filtros (Scope Bar) + Resumo (Summary Strip) — cantos arredondados e margem antes do mapa */}
+              <div className="rounded-2xl overflow-hidden border border-border bg-white shadow-lg mb-6">
+                <ScopeBar
+                  selectedRegiao={geo.state.selectedRegiao}
+                  selectedEstado={geo.state.selectedEstado}
+                  onRegiaoChange={(regiao) => geo.dispatch({ type: 'SET_REGIAO', regiao })}
+                  onEstadoChange={(estado) => geo.dispatch({ type: 'SET_ESTADO', estado })}
+                  onResetToBrasil={() => geo.dispatch({ type: 'RESET_TO_BRASIL' })}
+                  onOpenDrawer={() => geo.dispatch({ type: 'TOGGLE_DRAWER' })}
+                  activeFilterCount={geo.activeFilterCount}
+                  sticky={false}
+                />
+                {/* Resumo — inline para garantir exibição (mesmo conteúdo do SummaryStrip) */}
+                <div className="flex-shrink-0 bg-white border-b border-border py-4 min-h-[4.5rem]" role="region" aria-label="Resumo do escopo">
+                  <Container>
+                    <div className="flex items-center gap-0 overflow-x-auto flex-wrap">
+                      <div className="flex items-center gap-2.5 pr-5 border-r border-border mr-5 min-w-fit">
+                        <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 text-lg">
+                          {geo.scopeLabel === 'Brasil' ? '🇧🇷' : ['Norte', 'Nordeste', 'Centro-Oeste', 'Sudeste', 'Sul'].includes(geo.scopeLabel) ? '🗺️' : '📍'}
+                        </div>
+                        <div>
+                          <h3 className="text-[0.95rem] font-bold text-text leading-tight">
+                            {geo.scopeLabel === 'Brasil' ? 'Resumo Brasil' : geo.scopeLabel}
+                          </h3>
+                          <span className="text-[0.72rem] text-text-muted font-medium">{geo.scopeSublabel}</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-0 flex-1 flex-wrap">
+                        <div className="px-5 border-r border-border last:border-r-0 min-w-fit">
+                          <div className="text-xl font-bold leading-tight tracking-tight text-primary">
+                            {new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(MALHA_STATS.total.registros)}
+                          </div>
+                          <div className="text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-text-muted mt-0.5">Polígonos</div>
+                        </div>
+                        <div className="px-5 border-r border-border last:border-r-0 min-w-fit">
+                          <div className="text-xl font-bold leading-tight tracking-tight text-primary">
+                            {MALHA_STATS.total.area_ha >= 1_000_000
+                              ? `${(MALHA_STATS.total.area_ha / 1_000_000).toFixed(0)} M ha`
+                              : MALHA_STATS.total.area_ha >= 1_000
+                                ? `${(MALHA_STATS.total.area_ha / 1_000).toFixed(0)} mil ha`
+                                : `${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(MALHA_STATS.total.area_ha)} ha`}
+                          </div>
+                          <div className="text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-text-muted mt-0.5">Área Total</div>
+                        </div>
+                        <div className="px-5 border-r border-border last:border-r-0 min-w-fit">
+                          <div className="text-xl font-bold leading-tight tracking-tight text-primary">{MALHA_STATS.por_bioma.length}</div>
+                          <div className="text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-text-muted mt-0.5">Biomas</div>
+                        </div>
+                        <div className="px-5 border-r border-border last:border-r-0 min-w-fit">
+                          <div className="text-xl font-bold leading-tight tracking-tight text-primary">{MALHA_STATS.por_categoria.length}</div>
+                          <div className="text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-text-muted mt-0.5">Categorias</div>
+                        </div>
+                      </div>
+                    </div>
+                  </Container>
+                </div>
+              </div>
 
               {/* Mapa */}
-              <div className="mt-4 relative bg-white border border-border rounded-lg overflow-hidden shadow-card">
+              <div className="relative bg-white border border-border rounded-2xl overflow-hidden shadow-lg">
                 <ActiveFilterChips
                   selectedBiomas={geo.state.selectedBiomas}
                   selectedCategoria={geo.state.selectedCategoria}
@@ -308,7 +344,7 @@ const Dashboard: React.FC = () => {
 
               {/* Detalhes do polígono clicado */}
               {geo.state.clickedFeature && (
-                <div className="mt-4 p-4 bg-white rounded-lg border border-border shadow-card">
+                <div className="mt-6 p-5 bg-white rounded-2xl border border-border shadow-lg">
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="text-body-md font-semibold text-text">Detalhes do Polígono</h4>
                     <button
@@ -357,7 +393,7 @@ const Dashboard: React.FC = () => {
               )}
 
               {/* Fonte */}
-              <div className="mt-3 flex items-center justify-between px-4 py-3 bg-white border border-border rounded-md text-[0.78rem] text-text-muted">
+              <div className="mt-4 flex items-center justify-between px-5 py-3.5 bg-white border border-border rounded-xl text-[0.78rem] text-text-muted shadow-sm">
                 <span>Dados: Malha Fundiária 2025 (iGPP/OPGT) · 174.723 polígonos · Atualização semestral</span>
                 <Link to="/metodologia" className="text-primary font-semibold hover:underline hidden sm:inline">
                   Consultar Metodologia ›

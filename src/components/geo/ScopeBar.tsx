@@ -10,6 +10,8 @@ interface ScopeBarProps {
   onResetToBrasil: () => void;
   onOpenDrawer: () => void;
   activeFilterCount: number;
+  /** Quando false, desativa sticky para não sobrepor o resumo no mesmo card (ex.: Dashboard) */
+  sticky?: boolean;
 }
 
 const ScopeBar: React.FC<ScopeBarProps> = ({
@@ -20,6 +22,7 @@ const ScopeBar: React.FC<ScopeBarProps> = ({
   onResetToBrasil,
   onOpenDrawer,
   activeFilterCount,
+  sticky = true,
 }) => {
   const isBrasilActive = !selectedRegiao && !selectedEstado;
   const estadosDisponiveis = selectedRegiao ? getEstadosByRegiao(selectedRegiao) : ESTADOS;
@@ -31,7 +34,7 @@ const ScopeBar: React.FC<ScopeBarProps> = ({
   const selectActive = `${selectBase} bg-primary text-white border-primary font-semibold bg-[url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2710%27%20height%3D%276%27%20viewBox%3D%270%200%2010%206%27%3E%3Cpath%20d%3D%27M0%200l5%206%205-6z%27%20fill%3D%27white%27%2F%3E%3C%2Fsvg%3E")]`;
 
   return (
-    <div className="sticky top-[4.5rem] z-30 bg-white/95 backdrop-blur-md border-b border-border">
+    <div className={`${sticky ? 'sticky top-[4.5rem] z-30' : 'relative z-0'} bg-white border-b border-border`}>
       <Container>
         <div className="flex items-center gap-3 py-3 flex-wrap">
           {/* Label */}
