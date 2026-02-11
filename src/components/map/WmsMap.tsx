@@ -23,6 +23,9 @@ L.Icon.Default.mergeOptions({
 /** Zoom mínimo para carregar a camada WMS (evita OOM com 174k polígonos) */
 const MIN_WMS_ZOOM = 4;
 
+/** Timeout em ms após o qual consideramos falha (GeoServer inativo) */
+const LOAD_TIMEOUT_MS = 30000;
+
 /**
  * Componente WMS que usa L.tileLayer.wms diretamente.
  *
@@ -30,13 +33,26 @@ const MIN_WMS_ZOOM = 4;
  * com cores distintas por categoria fundiária e fill-opacity 0.7.
  * Só carrega tiles a partir do zoom 6 para evitar sobrecarga no servidor.
  * Mostra indicador de loading enquanto tiles estão carregando.
+ * Em caso de timeout ou muitos tiles com erro, mostra estado de erro e botão "Tentar novamente".
  */
 function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
   const map = useMap();
   const layerRef = useRef<L.TileLayer.WMS | null>(null);
   const [isVisible, setIsVisible] = useState(map.getZoom() >= MIN_WMS_ZOOM);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const pendingTilesRef = useRef(0);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tilesStartedRef = useRef(0);
+  const tilesErroredRef = useRef(0);
+
+  const clearLoadingTimeout = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }, []);
 
   // Monitora zoom para mostrar/esconder layer
   useEffect(() => {
@@ -45,13 +61,14 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
     return () => { map.off('zoomend', onZoom); };
   }, [map]);
 
-  // Cria/remove o layer WMS quando isVisible ou cqlFilter muda
+  // Cria/remove o layer WMS quando isVisible, cqlFilter ou retryCount muda
   useEffect(() => {
-    // Remove layer anterior se existe
     if (layerRef.current) {
       map.removeLayer(layerRef.current);
       layerRef.current = null;
     }
+    clearLoadingTimeout();
+    setError(false);
 
     if (!isVisible) {
       setLoading(false);
@@ -80,26 +97,56 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
       updateWhenZooming: false,  // Só atualiza tiles ao fim do zoom (evita muitas requisições durante animação)
     } as L.WMSOptions);
 
-    // Tracking de loading
     pendingTilesRef.current = 0;
+    tilesStartedRef.current = 0;
+    tilesErroredRef.current = 0;
+
+    const trySetErrorFromTiles = () => {
+      const started = tilesStartedRef.current;
+      const errored = tilesErroredRef.current;
+      if (started >= 2 && errored / started > 0.5) {
+        clearLoadingTimeout();
+        setError(true);
+        setLoading(false);
+      }
+    };
 
     wmsLayer.on('tileloadstart', () => {
       pendingTilesRef.current++;
+      tilesStartedRef.current++;
       setLoading(true);
+      if (!timeoutRef.current) {
+        timeoutRef.current = setTimeout(() => {
+          timeoutRef.current = null;
+          if (pendingTilesRef.current > 0) {
+            setError(true);
+            setLoading(false);
+          }
+        }, LOAD_TIMEOUT_MS);
+      }
     });
 
     wmsLayer.on('tileload', () => {
       pendingTilesRef.current = Math.max(0, pendingTilesRef.current - 1);
-      if (pendingTilesRef.current === 0) setLoading(false);
+      if (pendingTilesRef.current === 0) {
+        clearLoadingTimeout();
+        setLoading(false);
+      }
     });
 
     wmsLayer.on('tileerror', () => {
       pendingTilesRef.current = Math.max(0, pendingTilesRef.current - 1);
-      if (pendingTilesRef.current === 0) setLoading(false);
+      tilesErroredRef.current++;
+      trySetErrorFromTiles();
+      if (pendingTilesRef.current === 0) {
+        clearLoadingTimeout();
+        setLoading(false);
+      }
     });
 
     wmsLayer.on('load', () => {
       pendingTilesRef.current = 0;
+      clearLoadingTimeout();
       setLoading(false);
     });
 
@@ -107,13 +154,19 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
     layerRef.current = wmsLayer;
 
     return () => {
+      clearLoadingTimeout();
       if (layerRef.current) {
         map.removeLayer(layerRef.current);
         layerRef.current = null;
       }
       setLoading(false);
     };
-  }, [map, cqlFilter, isVisible]);
+  }, [map, cqlFilter, isVisible, retryCount, clearLoadingTimeout]);
+
+  const handleRetry = useCallback(() => {
+    setError(false);
+    setRetryCount((c) => c + 1);
+  }, []);
 
   // Mensagem de zoom mínimo
   if (!isVisible) {
@@ -137,6 +190,48 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
         }}
       >
         Aplique zoom para visualizar os polígonos da malha fundiária
+      </div>
+    );
+  }
+
+  // Estado de erro (timeout ou muitos tiles falharam)
+  if (error) {
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          top: 12,
+          right: 12,
+          zIndex: 1000,
+          background: 'rgba(255,255,255,0.92)',
+          padding: '10px 14px',
+          borderRadius: 6,
+          fontSize: '12px',
+          fontWeight: 500,
+          color: '#333',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+          maxWidth: 280,
+        }}
+      >
+        <p style={{ margin: 0, marginBottom: 8 }}>
+          Não foi possível carregar a camada. O servidor pode estar indisponível.
+        </p>
+        <button
+          type="button"
+          onClick={handleRetry}
+          style={{
+            padding: '6px 12px',
+            fontSize: '12px',
+            fontWeight: 600,
+            color: '#fff',
+            background: '#2d6a4f',
+            border: 'none',
+            borderRadius: 6,
+            cursor: 'pointer',
+          }}
+        >
+          Tentar novamente
+        </button>
       </div>
     );
   }

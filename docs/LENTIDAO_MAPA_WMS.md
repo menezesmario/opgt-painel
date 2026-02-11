@@ -77,3 +77,22 @@ Assim reduz-se o número de requisições durante a interação; o custo é que,
 
 4. **Rede:**
    - Se o GeoServer estiver em outra região (ex.: EUA) e os usuários no Brasil, a latência de rede pode ser relevante; considerar deploy do GeoServer mais próximo do público-alvo.
+
+---
+
+## Se o mapa ficar em "Carregando camada..." sem parar
+
+O painel exibe um indicador de erro e botão "Tentar novamente" após 30 segundos sem resposta. Se isso acontecer com frequência:
+
+1. **Verificar o GeoServer no Railway**
+   - Acesse o painel do [Railway](https://railway.app) e abra o projeto do GeoServer.
+   - Confira se o serviço `opgt-geoserver-deploy-production` está **Running** (não Sleeping/Stopped).
+   - Veja os **logs** para erros, crash ou cold start.
+
+2. **Reativar o serviço**
+   - Se estiver parado ou "adormecido": use **Restart** ou **Redeploy** no painel do Railway.
+   - No free tier, serviços inativos podem ser pausados — um novo deploy ou health check externo pode reacordá-los.
+
+3. **Testar a URL**
+   - Abra no navegador: `https://opgt-geoserver-deploy-production.up.railway.app/geoserver/web/`
+   - Se não carregar em até ~30s, o servidor está indisponível; após reiniciar no Railway, teste de novo.
