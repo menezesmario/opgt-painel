@@ -21,7 +21,7 @@ L.Icon.Default.mergeOptions({
 });
 
 /** Zoom mínimo para carregar a camada WMS (evita OOM com 174k polígonos) */
-const MIN_WMS_ZOOM = 5;
+const MIN_WMS_ZOOM = 4;
 
 /**
  * Componente WMS que usa L.tileLayer.wms diretamente.
@@ -58,19 +58,25 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
       return;
     }
 
-    const params: Record<string, string | boolean> = {
+    const params: Record<string, string | boolean | number> = {
       layers: GEOSERVER_LAYERS.malhafundiaria.name,
-      format: 'image/png',
+      format: 'image/png8',      // PNG 8-bit — ~70% menor que png24, suficiente para mapas temáticos
       transparent: true,
       version: '1.1.1',
       srs: 'EPSG:4326',
+      tiled: true,               // Ativa GWC (GeoServer tile caching)
+      tilesOrigin: '-180,-90',   // Alinha grid de tiles para cache
     };
 
     if (cqlFilter) {
       params.CQL_FILTER = cqlFilter;
     }
 
-    const wmsLayer = L.tileLayer.wms(WMS_TILES_URL, params);
+    const wmsLayer = L.tileLayer.wms(WMS_TILES_URL, {
+      ...params,
+      tileSize: 512,             // Tiles maiores = menos requests (4x menos que 256)
+      detectRetina: false,       // Evita tiles 2x que dobram o tempo de render
+    } as L.WMSOptions);
 
     // Tracking de loading
     pendingTilesRef.current = 0;
@@ -263,7 +269,7 @@ function BoundsUpdater({ bounds }: { bounds?: [[number, number], [number, number
     }
 
     if (bounds) {
-      map.flyToBounds(bounds, { padding: [30, 30], maxZoom: 8, duration: 0.8 });
+      map.flyToBounds(bounds, { padding: [30, 30], maxZoom: 10, duration: 0.8 });
     } else if (prevBoundsRef.current) {
       // Voltar ao Brasil
       map.flyTo(BRAZIL_CENTER, BRAZIL_ZOOM, { duration: 0.8 });

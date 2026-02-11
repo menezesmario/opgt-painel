@@ -60,11 +60,24 @@ export const ESTADOS: Estado[] = [
 export const getEstadosByRegiao = (regiao: string): Estado[] =>
   ESTADOS.filter((e) => e.regiao === regiao);
 
-/** Constrói filtro CQL para cd_mun baseado nos estados selecionados */
+/**
+ * Constrói filtro CQL para cd_mun baseado nos estados selecionados.
+ * cd_mun é INTEGER no PostGIS (código IBGE de 7 dígitos, ex: 1501402 = Belém/PA).
+ * Usa comparação numérica (range) em vez de LIKE para compatibilidade e performance.
+ * Código IBGE "15" (2 dígitos) → cd_mun >= 1500000 AND cd_mun < 1600000
+ */
 export const buildEstadoCqlFilter = (codigosIBGE: string[]): string | null => {
   if (codigosIBGE.length === 0) return null;
-  if (codigosIBGE.length === 1) return `cd_mun LIKE '${codigosIBGE[0]}%'`;
-  // Múltiplos estados: cd_mun LIKE '15%' OR cd_mun LIKE '13%'
-  const parts = codigosIBGE.map((c) => `cd_mun LIKE '${c}%'`);
+
+  const buildRange = (code: string) => {
+    const prefix = parseInt(code, 10);
+    const min = prefix * 100000;       // ex: 15 → 1500000
+    const max = (prefix + 1) * 100000; // ex: 15 → 1600000
+    return `(cd_mun >= ${min} AND cd_mun < ${max})`;
+  };
+
+  if (codigosIBGE.length === 1) return buildRange(codigosIBGE[0]);
+
+  const parts = codigosIBGE.map(buildRange);
   return `(${parts.join(' OR ')})`;
 };

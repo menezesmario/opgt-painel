@@ -79,9 +79,9 @@ const VisualizacaoGeo: React.FC = () => {
         categoriaCount={MALHA_STATS.por_categoria.length}
       />
 
-      {/* Mapa — full width */}
+      {/* Mapa */}
       <section className="py-5 bg-bg-alt">
-        <Container size="wide">
+        <Container>
           {/* Mapa com chips sobrepostos */}
           <div className="relative bg-white border border-border rounded-lg overflow-hidden shadow-card">
             {/* Active filter chips */}

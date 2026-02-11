@@ -5,14 +5,14 @@
 
 const GEOSERVER_DIRECT = 'https://opgt-geoserver-deploy-production.up.railway.app/geoserver';
 
-// Proxy via Vercel (evita CORS para fetch/GetFeatureInfo)
-// Em dev, acessa GeoServer diretamente
-export const GEOSERVER_BASE = import.meta.env.DEV ? GEOSERVER_DIRECT : '/geoserver';
+// Proxy unificado: Vite proxy em dev, Vercel rewrite em prod
+// Ambos redirecionam /geoserver/* → GeoServer Railway
+export const GEOSERVER_BASE = '/geoserver';
 
 // URL direta para tiles WMS (carregados via <img>, não precisa de CORS)
 export const WMS_TILES_URL = `${GEOSERVER_DIRECT}/opgt/wms`;
 
-// URL para fetch (GetFeatureInfo, WFS) — usa proxy em prod
+// URL para fetch (GetFeatureInfo, WFS) — via proxy para evitar CORS
 export const WMS_URL = `${GEOSERVER_BASE}/opgt/wms`;
 export const WFS_URL = `${GEOSERVER_BASE}/opgt/wfs`;
 

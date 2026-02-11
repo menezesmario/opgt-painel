@@ -21,7 +21,7 @@ const ActiveFilterChips: React.FC<ActiveFilterChipsProps> = ({
   if (selectedBiomas.length === 0 && !selectedCategoria) return null;
 
   return (
-    <div className="absolute top-3 left-3 z-[500] flex flex-wrap gap-1.5 max-w-[60%] pointer-events-auto">
+    <div className="absolute top-3 left-14 z-[1001] flex flex-wrap gap-1.5 max-w-[55%] pointer-events-auto">
       {selectedBiomas.map((bioma) => (
         <span
           key={bioma}

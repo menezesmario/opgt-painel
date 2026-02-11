@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import Tag from '../ui/Tag';
 import {
   MALHA_STATS,
@@ -86,11 +87,13 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({
 
   const draftCount = draftBiomas.length + (draftCategoria ? 1 : 0);
 
-  return (
+  // Renderiza via Portal no document.body para escapar stacking contexts
+  // (backdrop-blur no ScopeBar cria containing block que quebra position:fixed)
+  return createPortal(
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 z-40 bg-black/40 transition-opacity duration-250 ${
+        className={`fixed inset-0 z-[9998] bg-black/40 transition-opacity duration-250 ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
@@ -99,7 +102,7 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 bottom-0 w-[360px] max-w-[90vw] z-50 bg-white shadow-strong
+        className={`fixed top-0 right-0 h-screen w-[360px] max-w-[90vw] z-[9999] bg-white shadow-strong
           flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
         role="dialog"
@@ -107,7 +110,7 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({
         aria-label="Filtros e Camadas"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+        <div className="flex-shrink-0 flex items-center justify-between px-6 py-5 border-b border-border">
           <h3 className="text-base font-bold text-text">Filtros & Camadas</h3>
           <button
             onClick={onClose}
@@ -119,8 +122,8 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({
           </button>
         </div>
 
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 scrollbar-thin">
+        {/* Body — scrollable */}
+        <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 scrollbar-thin">
           {/* ── Bioma ── */}
           <div className="mb-7">
             <div className="text-[0.7rem] font-bold uppercase tracking-[0.08em] text-text-muted mb-3">
@@ -212,7 +215,7 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-border flex gap-2.5">
+        <div className="flex-shrink-0 px-6 py-4 border-t border-border flex gap-2.5">
           <button
             onClick={clearAll}
             className="px-4 py-2.5 text-[0.85rem] font-medium text-text-muted border-[1.5px] border-border rounded-md
@@ -229,7 +232,8 @@ const FilterDrawer: React.FC<FilterDrawerProps> = ({
           </button>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 };
 

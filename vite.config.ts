@@ -6,6 +6,14 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    open: true
-  }
+    open: true,
+    proxy: {
+      // Proxy para GeoServer — evita CORS em dev (mesmo padrão do Vercel em prod)
+      '/geoserver': {
+        target: 'https://opgt-geoserver-deploy-production.up.railway.app',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
 });
