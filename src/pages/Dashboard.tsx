@@ -354,7 +354,9 @@ const Dashboard: React.FC = () => {
                   <Suspense fallback={<Skeleton variant="map" className="h-[65vh]" />}>
                     <WmsMap
                       cqlFilter={geo.cqlFilter}
-                      wmsEnabled={geo.hasScope}
+                      scopeOnlyCql={geo.scopeOnlyCql}
+                      useGradualLoad={geo.useGradualLoad}
+                      wmsEnabled
                       onFeatureClick={(props) => geo.dispatch({ type: 'SET_FEATURE', feature: props })}
                       bounds={geo.bounds}
                       minHeight="65vh"

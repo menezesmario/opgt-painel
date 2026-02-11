@@ -65,6 +65,11 @@ export const CATEGORIA_FUNDIARIA_COLORS: Record<string, string> = {
   'TQD': '#b0804d',
 };
 
+/** Ordem das categorias para carregamento gradual (uma camada por vez). Apenas códigos simples (sem vírgula). */
+export const CATEGORIA_FUNDIARIA_GRADUAL_ORDER: string[] = Object.keys(CATEGORIA_FUNDIARIA_COLORS).filter(
+  (k) => !k.includes(',')
+);
+
 /** Labels legíveis para as categorias fundiárias */
 export const CATEGORIA_FUNDIARIA_LABELS: Record<string, string> = {
   'IRP': 'Imóvel Rural Particular',

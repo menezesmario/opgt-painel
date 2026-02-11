@@ -127,6 +127,27 @@ export function useGeoFilters() {
     return parts.length > 0 ? parts.join(' AND ') : null;
   }, [state.selectedBiomas, state.selectedCategoria, state.selectedEstado, state.selectedRegiao]);
 
+  // CQL só escopo + biomas (sem categoria) — usado para carregamento gradual por categoria
+  const scopeOnlyCql = useMemo((): string | null => {
+    const parts: string[] = [];
+    if (state.selectedBiomas.length > 0) {
+      const list = state.selectedBiomas.map((b) => `'${b}'`).join(',');
+      parts.push(`bioma IN (${list})`);
+    }
+    if (state.selectedEstado) {
+      const f = buildEstadoCqlFilter([state.selectedEstado]);
+      if (f) parts.push(f);
+    } else if (state.selectedRegiao) {
+      const codigos = getEstadosByRegiao(state.selectedRegiao).map((e) => e.codigoIBGE);
+      const f = buildEstadoCqlFilter(codigos);
+      if (f) parts.push(f);
+    }
+    return parts.length > 0 ? parts.join(' AND ') : null;
+  }, [state.selectedBiomas, state.selectedEstado, state.selectedRegiao]);
+
+  /** Quando true, carregar uma categoria por vez (em vez de todas de uma vez). Vale para Brasil ou para escopo (região/estado). */
+  const useGradualLoad = !state.selectedCategoria;
+
   // Contagem de filtros de conteúdo ativos (biomas + categoria)
   const activeFilterCount = state.selectedBiomas.length + (state.selectedCategoria ? 1 : 0);
 
@@ -163,6 +184,8 @@ export function useGeoFilters() {
     state,
     dispatch,
     cqlFilter,
+    scopeOnlyCql,
+    useGradualLoad,
     activeFilterCount,
     scopeLabel,
     scopeSublabel,

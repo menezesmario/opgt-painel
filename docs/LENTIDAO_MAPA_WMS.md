@@ -85,10 +85,9 @@ Assim reduz-se o número de requisições durante a interação; o custo é que,
 
 Para evitar primeiro carregamento pesado e melhorar a experiência:
 
-1. **Escopo obrigatório para a camada WMS**
-   - A camada WMS **só é carregada** quando há **região ou estado** selecionado (`wmsEnabled = hasScope`).
-   - Se o usuário estiver em "O Brasil" (sem região/estado), o mapa exibe apenas a base e um overlay: *"Selecione uma região ou estado no topo para visualizar os polígonos da malha fundiária."*
-   - Assim **nunca** se pede ao GeoServer o Brasil inteiro (174k polígonos) de uma vez.
+1. **Visualização geral do Brasil sem obrigar região/estado**
+   - O mapa **sempre** exibe a camada WMS (não há overlay obrigando a escolher região/estado).
+   - Em **"O Brasil"** (sem região/estado) ou em qualquer escopo, quando **nenhuma categoria** está selecionada, usa-se **carregamento gradual** (uma categoria por vez), evitando uma única requisição pesada.
 
 2. **Região padrão na abertura**
    - Na primeira abertura do Mapa Fundiário, o escopo inicial é **Sudeste** (região), em vez de vazio.
@@ -97,8 +96,11 @@ Para evitar primeiro carregamento pesado e melhorar a experiência:
 3. **Limitação de exibição**
    - Não há limite de *número* de polígonos por tile (isso é controlado pelo GeoServer por bbox + CQL). A limitação é **geográfica**: só solicitamos tiles quando há filtro de região ou estado, evitando a vista "Brasil inteiro" sem filtro.
 
-4. **Resumo**
-   - Boa prática: **primeiro carregamento limitado a um escopo** (região/estado), **nunca** carregar toda a malha sem restrição geográfica; usar overlay claro quando não houver escopo.
+4. **Carregamento gradual por categoria**
+   - Quando **nenhuma categoria** está selecionada (todas as categorias), o painel adiciona **uma camada WMS por categoria** a cada 2 segundos, na ordem de `CATEGORIA_FUNDIARIA_GRADUAL_ORDER`. Vale tanto para **Brasil inteiro** quanto para **região/estado** selecionado: o mapa vai "preenchendo" aos poucos e o GeoServer recebe requisições distribuídas no tempo. Se o usuário escolher **uma categoria** no drawer, volta ao carregamento em uma única camada.
+
+5. **Resumo**
+   - Boa prática: **primeiro carregamento limitado a um escopo** (região/estado), **nunca** carregar toda a malha sem restrição geográfica; usar overlay claro quando não houver escopo; **gradual por categoria** quando exibir todas as categorias no escopo.
 
 ---
 

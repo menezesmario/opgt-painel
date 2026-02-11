@@ -8,6 +8,7 @@ import {
   BRAZIL_CENTER,
   BRAZIL_ZOOM,
   CATEGORIA_FUNDIARIA_LABELS,
+  CATEGORIA_FUNDIARIA_GRADUAL_ORDER,
 } from '../../config/geoserver';
 // Leaflet CSS imported via index.css
 
@@ -32,6 +33,9 @@ const MAX_AUTO_RETRIES = 2;
 /** Intervalo em ms entre tentativas automáticas */
 const AUTO_RETRY_DELAY_MS = 12000;
 
+/** Intervalo em ms entre cada categoria no carregamento gradual */
+const GRADUAL_LAYER_DELAY_MS = 2000;
+
 /**
  * Componente WMS que usa L.tileLayer.wms diretamente.
  *
@@ -41,7 +45,14 @@ const AUTO_RETRY_DELAY_MS = 12000;
  * Mostra indicador de loading enquanto tiles estão carregando.
  * Em caso de timeout ou muitos tiles com erro, mostra estado de erro e botão "Tentar novamente".
  */
-function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
+function WmsLayer({
+  cqlFilter,
+  showLoadingIndicator = true,
+}: {
+  cqlFilter?: string | null;
+  /** Quando false, não exibe spinner/erro (útil no carregamento gradual). */
+  showLoadingIndicator?: boolean;
+}) {
   const map = useMap();
   const layerRef = useRef<L.TileLayer.WMS | null>(null);
   const [isVisible, setIsVisible] = useState(map.getZoom() >= MIN_WMS_ZOOM);
@@ -244,7 +255,7 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
   }
 
   // Estado de erro (timeout ou muitos tiles falharam)
-  if (error) {
+  if (error && showLoadingIndicator) {
     return (
       <div
         style={{
@@ -310,7 +321,7 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
   }
 
   // Indicador de carregamento
-  if (loading) {
+  if (loading && showLoadingIndicator) {
     return (
       <div
         style={{
@@ -359,6 +370,10 @@ interface FeatureInfo {
 interface WmsMapProps {
   /** Filtro CQL para a camada WMS (ex: "bioma = 'Amazônia'") */
   cqlFilter?: string | null;
+  /** CQL só escopo+biomas (sem categoria); usado no carregamento gradual. */
+  scopeOnlyCql?: string | null;
+  /** Se true e scopeOnlyCql presente, carrega uma categoria por vez em vez de todas de uma vez. */
+  useGradualLoad?: boolean;
   /** Se false, não carrega a camada WMS (evita pedir Brasil inteiro); mostra overlay pedindo região/estado. */
   wmsEnabled?: boolean;
   /** Callback quando clica num polígono e obtém dados */
@@ -426,6 +441,63 @@ function MapResizer() {
     return () => clearTimeout(timer);
   }, [map]);
   return null;
+}
+
+/**
+ * Monta uma WmsLayer por categoria, com atraso entre cada uma, para não sobrecarregar o GeoServer.
+ * Usado para "todas as categorias": com escopo (região/estado) ou Brasil inteiro (scopeOnlyCql null).
+ */
+function GradualWmsLayers({ scopeOnlyCql }: { scopeOnlyCql: string | null }) {
+  const total = CATEGORIA_FUNDIARIA_GRADUAL_ORDER.length;
+  const [visibleCount, setVisibleCount] = useState(1); // primeira categoria já visível
+
+  useEffect(() => {
+    if (visibleCount >= total) return;
+    const t = setTimeout(
+      () => setVisibleCount((c) => Math.min(c + 1, total)),
+      GRADUAL_LAYER_DELAY_MS
+    );
+    return () => clearTimeout(t);
+  }, [visibleCount, total]);
+
+  return (
+    <>
+      {CATEGORIA_FUNDIARIA_GRADUAL_ORDER.slice(0, visibleCount).map((cat) => {
+        const cql = scopeOnlyCql
+          ? `${scopeOnlyCql} AND categoria_fundiaria_v2025 = '${cat}'`
+          : `categoria_fundiaria_v2025 = '${cat}'`;
+        return (
+          <WmsLayer
+            key={cat}
+            cqlFilter={cql}
+            showLoadingIndicator={false}
+          />
+        );
+      })}
+      {visibleCount < total && (
+        <div
+          className="flex items-center gap-3 py-2 pl-3 pr-4 rounded-lg border border-border border-l-4 border-l-primary bg-white/95 text-body-sm font-medium text-text"
+          style={{
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            zIndex: 1000,
+            boxShadow: '0 2px 8px rgba(61, 90, 69, 0.08), 0 1px 2px rgba(0,0,0,0.04)',
+          }}
+        >
+          <span
+            className="flex-shrink-0 w-4 h-4 rounded-full border-2 border-primary/20 border-t-primary"
+            style={{ animation: 'wms-gradual-spin 0.7s linear infinite' }}
+            aria-hidden
+          />
+          <span>
+            Carregando camadas ({visibleCount}/{total})…
+          </span>
+          <style>{`@keyframes wms-gradual-spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      )}
+    </>
+  );
 }
 
 /** Overlay quando não há escopo (região/estado): evita carregar WMS do Brasil inteiro. */
@@ -506,6 +578,8 @@ const formatHa = (v: number) =>
  */
 const WmsMap: React.FC<WmsMapProps> = ({
   cqlFilter,
+  scopeOnlyCql,
+  useGradualLoad = false,
   wmsEnabled = true,
   onFeatureClick,
   minHeight = '500px',
@@ -522,6 +596,9 @@ const WmsMap: React.FC<WmsMapProps> = ({
     },
     [onFeatureClick]
   );
+
+  const effectiveCqlForClick = useGradualLoad ? scopeOnlyCql ?? undefined : cqlFilter;
+  const useGradual = wmsEnabled && useGradualLoad;
 
   return (
     <div className={`w-full ${className}`} style={{ minHeight }}>
@@ -545,10 +622,17 @@ const WmsMap: React.FC<WmsMapProps> = ({
 
         {/* Camada WMS só quando há escopo (região/estado) — evita carregar Brasil inteiro na abertura */}
         {wmsEnabled ? (
-          <>
-            <WmsLayer cqlFilter={cqlFilter} />
-            <ClickHandler onFeatureInfo={handleFeatureInfo} cqlFilter={cqlFilter} />
-          </>
+          useGradual ? (
+            <>
+              <GradualWmsLayers key={scopeOnlyCql ?? 'brasil'} scopeOnlyCql={scopeOnlyCql ?? null} />
+              <ClickHandler onFeatureInfo={handleFeatureInfo} cqlFilter={effectiveCqlForClick ?? null} />
+            </>
+          ) : (
+            <>
+              <WmsLayer cqlFilter={cqlFilter} />
+              <ClickHandler onFeatureInfo={handleFeatureInfo} cqlFilter={cqlFilter} />
+            </>
+          )
         ) : (
           <WmsScopeRequiredOverlay />
         )}
