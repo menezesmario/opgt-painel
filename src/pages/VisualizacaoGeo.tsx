@@ -36,6 +36,7 @@ const VisualizacaoGeo: React.FC = () => {
     scopeLabel,
     scopeSublabel,
     bounds,
+    hasScope,
   } = useGeoFilters();
 
   const { clickedFeature } = state;
@@ -96,6 +97,7 @@ const VisualizacaoGeo: React.FC = () => {
               <Suspense fallback={<Skeleton variant="map" className="h-[75vh]" />}>
                 <WmsMap
                   cqlFilter={cqlFilter}
+                  wmsEnabled={hasScope}
                   onFeatureClick={(props) => dispatch({ type: 'SET_FEATURE', feature: props })}
                   bounds={bounds}
                   minHeight="75vh"

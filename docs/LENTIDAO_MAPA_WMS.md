@@ -8,13 +8,14 @@ A lentidão ao carregar os polígonos da Malha Fundiária no mapa tende a vir de
 
 ## 1. Servidor GeoServer (Railway)
 
+- **Ambiente:** Railway **Pro** (serviços não são pausados por inatividade).
 - **URL dos tiles:** `https://opgt-geoserver-deploy-production.up.railway.app/geoserver/opgt/wms`
 - Os tiles WMS são pedidos **diretamente** ao Railway (sem passar pelo Vercel), para evitar CORS nas imagens.
 - Cada tile é uma requisição GetMap ao GeoServer, que precisa **renderizar** a camada PostGIS (174.723 polígonos) para o bbox daquele tile.
 - Com **CQL_FILTER** (filtro por bioma, categoria, estado/região), cada combinação de filtro gera URLs diferentes; o cache de tiles (GWC) normalmente não ajuda, então quase todo tile é renderizado sob demanda.
 - **Possíveis causas no servidor:**
-  - Cold start (Railway pode “adormecer” o serviço).
-  - Poucos recursos (CPU/RAM) no plano.
+  - Erros na aplicação (GeoServer/Tomcat) — ver Deploy Logs no Railway.
+  - Limites de memória/CPU do container (ex.: GeoServer com muitas camadas).
   - Rede/latência entre o usuário e o Railway.
   - Ausência de cache (GWC) para os filtros usados ou para zoom 4 (vista Brasil).
 
@@ -67,7 +68,7 @@ Assim reduz-se o número de requisições durante a interação; o custo é que,
 1. **Servidor (GeoServer/Railway):**
    - Medir tempo de resposta de um GetMap (um tile) com e sem CQL_FILTER (ex.: via aba Rede do navegador ou curl).
    - Verificar se há GWC configurado e se há cache para a camada e zooms usados.
-   - Avaliar plano/recurso do Railway (cold start, CPU, memória).
+   - No Railway Pro, conferir métricas (CPU/memória) e logs em caso de lentidão ou falhas.
 
 2. **Front-end (já aplicado):**
    - `updateWhenIdle: true` e `updateWhenZooming: false` no layer WMS para reduzir requisições durante pan/zoom.
@@ -80,18 +81,39 @@ Assim reduz-se o número de requisições durante a interação; o custo é que,
 
 ---
 
+## Boas práticas de carregamento e UX (aplicadas no painel)
+
+Para evitar primeiro carregamento pesado e melhorar a experiência:
+
+1. **Escopo obrigatório para a camada WMS**
+   - A camada WMS **só é carregada** quando há **região ou estado** selecionado (`wmsEnabled = hasScope`).
+   - Se o usuário estiver em "O Brasil" (sem região/estado), o mapa exibe apenas a base e um overlay: *"Selecione uma região ou estado no topo para visualizar os polígonos da malha fundiária."*
+   - Assim **nunca** se pede ao GeoServer o Brasil inteiro (174k polígonos) de uma vez.
+
+2. **Região padrão na abertura**
+   - Na primeira abertura do Mapa Fundiário, o escopo inicial é **Sudeste** (região), em vez de vazio.
+   - O primeiro carregamento fica limitado a uma região, reduzindo tempo e carga no servidor. O usuário pode trocar de região/estado ou limpar para "Brasil" (e aí verá o overlay até escolher de novo um escopo).
+
+3. **Limitação de exibição**
+   - Não há limite de *número* de polígonos por tile (isso é controlado pelo GeoServer por bbox + CQL). A limitação é **geográfica**: só solicitamos tiles quando há filtro de região ou estado, evitando a vista "Brasil inteiro" sem filtro.
+
+4. **Resumo**
+   - Boa prática: **primeiro carregamento limitado a um escopo** (região/estado), **nunca** carregar toda a malha sem restrição geográfica; usar overlay claro quando não houver escopo.
+
+---
+
 ## Se o mapa ficar em "Carregando camada..." sem parar
 
 O painel exibe um indicador de erro e botão "Tentar novamente" após 30 segundos sem resposta. Se isso acontecer com frequência:
 
 1. **Verificar o GeoServer no Railway**
    - Acesse o painel do [Railway](https://railway.app) e abra o projeto do GeoServer.
-   - Confira se o serviço `opgt-geoserver-deploy-production` está **Running** (não Sleeping/Stopped).
-   - Veja os **logs** para erros, crash ou cold start.
+   - Confira se o serviço `opgt-geoserver-deploy-production` está **Online**. No plano Pro não há pausa por inatividade; se a página não carrega, o problema costuma ser da aplicação (erros no GeoServer/Tomcat).
+   - Veja os **Deploy Logs** do serviço: stack traces (ex.: `ErrorReportValve`, `StandardEngineValve`) indicam falhas internas; a primeira linha do erro costuma mostrar a causa (ex.: OutOfMemoryError, falha de conexão com PostGIS).
 
 2. **Reativar o serviço**
-   - Se estiver parado ou "adormecido": use **Restart** ou **Redeploy** no painel do Railway.
-   - No free tier, serviços inativos podem ser pausados — um novo deploy ou health check externo pode reacordá-los.
+   - Use **Restart** para subir de novo o container com a mesma imagem (recomendado como primeiro passo).
+   - Se não resolver, use **Redeploy** para refazer o build/deploy.
 
 3. **Testar a URL**
    - Abra no navegador: `https://opgt-geoserver-deploy-production.up.railway.app/geoserver/web/`

@@ -12,8 +12,11 @@ export interface GeoFilterState {
   clickedFeature: Record<string, unknown> | null;
 }
 
+/** Região padrão na abertura do mapa: primeiro carregamento fica limitado a uma região (mais leve que Brasil inteiro). */
+const DEFAULT_REGIAO = 'Sudeste';
+
 const initialState: GeoFilterState = {
-  selectedRegiao: '',
+  selectedRegiao: DEFAULT_REGIAO,
   selectedEstado: '',
   selectedBiomas: [],
   selectedCategoria: '',

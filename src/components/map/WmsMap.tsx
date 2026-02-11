@@ -26,6 +26,12 @@ const MIN_WMS_ZOOM = 4;
 /** Timeout em ms após o qual consideramos falha (GeoServer inativo) */
 const LOAD_TIMEOUT_MS = 30000;
 
+/** Número de tentativas automáticas antes de mostrar erro ao usuário */
+const MAX_AUTO_RETRIES = 2;
+
+/** Intervalo em ms entre tentativas automáticas */
+const AUTO_RETRY_DELAY_MS = 12000;
+
 /**
  * Componente WMS que usa L.tileLayer.wms diretamente.
  *
@@ -42,10 +48,14 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [isAutoRetrying, setIsAutoRetrying] = useState(false);
+  const [retryInSeconds, setRetryInSeconds] = useState<number | null>(null);
   const pendingTilesRef = useRef(0);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoRetryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tilesStartedRef = useRef(0);
   const tilesErroredRef = useRef(0);
+  const autoRetriesUsedRef = useRef(0);
 
   const clearLoadingTimeout = useCallback(() => {
     if (timeoutRef.current) {
@@ -54,12 +64,47 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
     }
   }, []);
 
+  const clearAutoRetryTimeout = useCallback(() => {
+    if (autoRetryTimeoutRef.current) {
+      clearTimeout(autoRetryTimeoutRef.current);
+      autoRetryTimeoutRef.current = null;
+    }
+  }, []);
+
+  /** Marca falha: faz auto-retry até MAX_AUTO_RETRIES vezes; depois mostra erro. */
+  const setErrorOrAutoRetry = useCallback(() => {
+    clearLoadingTimeout();
+    setLoading(false);
+    if (autoRetriesUsedRef.current < MAX_AUTO_RETRIES) {
+      autoRetriesUsedRef.current++;
+      setIsAutoRetrying(true);
+      setRetryInSeconds(Math.ceil(AUTO_RETRY_DELAY_MS / 1000));
+      autoRetryTimeoutRef.current = setTimeout(() => {
+        autoRetryTimeoutRef.current = null;
+        setRetryCount((c) => c + 1);
+        setIsAutoRetrying(false);
+        setRetryInSeconds(null);
+      }, AUTO_RETRY_DELAY_MS);
+    } else {
+      setError(true);
+    }
+  }, [clearLoadingTimeout]);
+
   // Monitora zoom para mostrar/esconder layer
   useEffect(() => {
     const onZoom = () => setIsVisible(map.getZoom() >= MIN_WMS_ZOOM);
     map.on('zoomend', onZoom);
     return () => { map.off('zoomend', onZoom); };
   }, [map]);
+
+  // Countdown para mensagem "Tentando novamente em X s"
+  useEffect(() => {
+    if (retryInSeconds == null || retryInSeconds <= 0) return;
+    const id = setInterval(() => {
+      setRetryInSeconds((s) => (s != null && s > 0 ? s - 1 : null));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [retryInSeconds]);
 
   // Cria/remove o layer WMS quando isVisible, cqlFilter ou retryCount muda
   useEffect(() => {
@@ -68,7 +113,10 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
       layerRef.current = null;
     }
     clearLoadingTimeout();
+    clearAutoRetryTimeout();
     setError(false);
+    setIsAutoRetrying(false);
+    setRetryInSeconds(null);
 
     if (!isVisible) {
       setLoading(false);
@@ -105,9 +153,7 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
       const started = tilesStartedRef.current;
       const errored = tilesErroredRef.current;
       if (started >= 2 && errored / started > 0.5) {
-        clearLoadingTimeout();
-        setError(true);
-        setLoading(false);
+        setErrorOrAutoRetry();
       }
     };
 
@@ -119,8 +165,7 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
         timeoutRef.current = setTimeout(() => {
           timeoutRef.current = null;
           if (pendingTilesRef.current > 0) {
-            setError(true);
-            setLoading(false);
+            setErrorOrAutoRetry();
           }
         }, LOAD_TIMEOUT_MS);
       }
@@ -129,6 +174,7 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
     wmsLayer.on('tileload', () => {
       pendingTilesRef.current = Math.max(0, pendingTilesRef.current - 1);
       if (pendingTilesRef.current === 0) {
+        autoRetriesUsedRef.current = 0;
         clearLoadingTimeout();
         setLoading(false);
       }
@@ -146,6 +192,7 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
 
     wmsLayer.on('load', () => {
       pendingTilesRef.current = 0;
+      autoRetriesUsedRef.current = 0;
       clearLoadingTimeout();
       setLoading(false);
     });
@@ -155,15 +202,17 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
 
     return () => {
       clearLoadingTimeout();
+      clearAutoRetryTimeout();
       if (layerRef.current) {
         map.removeLayer(layerRef.current);
         layerRef.current = null;
       }
       setLoading(false);
     };
-  }, [map, cqlFilter, isVisible, retryCount, clearLoadingTimeout]);
+  }, [map, cqlFilter, isVisible, retryCount, clearLoadingTimeout, clearAutoRetryTimeout, setErrorOrAutoRetry]);
 
   const handleRetry = useCallback(() => {
+    autoRetriesUsedRef.current = 0;
     setError(false);
     setRetryCount((c) => c + 1);
   }, []);
@@ -236,6 +285,30 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
     );
   }
 
+  // Tentativa automática em andamento
+  if (isAutoRetrying) {
+    const sec = retryInSeconds ?? Math.ceil(AUTO_RETRY_DELAY_MS / 1000);
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          top: 12,
+          right: 12,
+          zIndex: 1000,
+          background: 'rgba(255,255,255,0.92)',
+          padding: '8px 14px',
+          borderRadius: 6,
+          fontSize: '12px',
+          fontWeight: 500,
+          color: '#333',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+        }}
+      >
+        Camada indisponível. Tentando novamente em {sec} s…
+      </div>
+    );
+  }
+
   // Indicador de carregamento
   if (loading) {
     return (
@@ -286,6 +359,8 @@ interface FeatureInfo {
 interface WmsMapProps {
   /** Filtro CQL para a camada WMS (ex: "bioma = 'Amazônia'") */
   cqlFilter?: string | null;
+  /** Se false, não carrega a camada WMS (evita pedir Brasil inteiro); mostra overlay pedindo região/estado. */
+  wmsEnabled?: boolean;
   /** Callback quando clica num polígono e obtém dados */
   onFeatureClick?: (properties: Record<string, unknown>) => void;
   /** Altura mínima do mapa */
@@ -353,6 +428,48 @@ function MapResizer() {
   return null;
 }
 
+/** Overlay quando não há escopo (região/estado): evita carregar WMS do Brasil inteiro. */
+function WmsScopeRequiredOverlay() {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 800,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(248, 249, 246, 0.85)',
+        pointerEvents: 'none',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 320,
+          padding: '20px 24px',
+          textAlign: 'center',
+          background: 'rgba(255,255,255,0.95)',
+          borderRadius: 12,
+          boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+          fontSize: '14px',
+          color: '#333',
+          lineHeight: 1.5,
+        }}
+      >
+        <p style={{ margin: 0, fontWeight: 600 }}>
+          Selecione uma região ou estado no topo
+        </p>
+        <p style={{ margin: '8px 0 0', fontWeight: 400, color: '#555' }}>
+          para visualizar os polígonos da malha fundiária.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 /** Controla viewport do mapa com base no escopo geográfico (bounds ou Brasil) */
 function BoundsUpdater({ bounds }: { bounds?: [[number, number], [number, number]] | null }) {
   const map = useMap();
@@ -389,6 +506,7 @@ const formatHa = (v: number) =>
  */
 const WmsMap: React.FC<WmsMapProps> = ({
   cqlFilter,
+  wmsEnabled = true,
   onFeatureClick,
   minHeight = '500px',
   className = '',
@@ -425,11 +543,15 @@ const WmsMap: React.FC<WmsMapProps> = ({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
         />
 
-        {/* Camada WMS do GeoServer — estilo malha_categorias (cores por categoria fundiária) */}
-        <WmsLayer cqlFilter={cqlFilter} />
-
-        {/* Handler de clique para GetFeatureInfo */}
-        <ClickHandler onFeatureInfo={handleFeatureInfo} cqlFilter={cqlFilter} />
+        {/* Camada WMS só quando há escopo (região/estado) — evita carregar Brasil inteiro na abertura */}
+        {wmsEnabled ? (
+          <>
+            <WmsLayer cqlFilter={cqlFilter} />
+            <ClickHandler onFeatureInfo={handleFeatureInfo} cqlFilter={cqlFilter} />
+          </>
+        ) : (
+          <WmsScopeRequiredOverlay />
+        )}
 
         {/* Popup com detalhes do polígono */}
         {popup && (
