@@ -189,6 +189,8 @@ interface WmsMapProps {
   minHeight?: string;
   /** Classe CSS adicional */
   className?: string;
+  /** Bounding box para flyToBounds (null = volta ao Brasil) */
+  bounds?: [[number, number], [number, number]] | null;
 }
 
 /** Componente interno para lidar com cliques e GetFeatureInfo */
@@ -248,6 +250,31 @@ function MapResizer() {
   return null;
 }
 
+/** Controla viewport do mapa com base no escopo geográfico (bounds ou Brasil) */
+function BoundsUpdater({ bounds }: { bounds?: [[number, number], [number, number]] | null }) {
+  const map = useMap();
+  const prevBoundsRef = useRef<[[number, number], [number, number]] | null | undefined>(undefined);
+
+  useEffect(() => {
+    // Ignora a chamada inicial (não animar ao montar)
+    if (prevBoundsRef.current === undefined) {
+      prevBoundsRef.current = bounds ?? null;
+      return;
+    }
+
+    if (bounds) {
+      map.flyToBounds(bounds, { padding: [30, 30], maxZoom: 8, duration: 0.8 });
+    } else if (prevBoundsRef.current) {
+      // Voltar ao Brasil
+      map.flyTo(BRAZIL_CENTER, BRAZIL_ZOOM, { duration: 0.8 });
+    }
+
+    prevBoundsRef.current = bounds ?? null;
+  }, [map, bounds]);
+
+  return null;
+}
+
 const formatHa = (v: number) =>
   new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(v) + ' ha';
 
@@ -262,6 +289,7 @@ const WmsMap: React.FC<WmsMapProps> = ({
   onFeatureClick,
   minHeight = '500px',
   className = '',
+  bounds,
 }) => {
   const [popup, setPopup] = useState<FeatureInfo | null>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -286,6 +314,7 @@ const WmsMap: React.FC<WmsMapProps> = ({
         ref={mapRef}
       >
         <MapResizer />
+        <BoundsUpdater bounds={bounds} />
 
         {/* Base tiles — CartoDB Voyager (fronteiras e labels mais visíveis) */}
         <TileLayer
