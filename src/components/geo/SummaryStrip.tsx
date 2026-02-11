@@ -35,7 +35,7 @@ const SummaryStrip: React.FC<SummaryStripProps> = ({
   categoriaCount,
 }) => {
   return (
-    <div className="bg-white border-b border-border py-3">
+    <div className="flex-shrink-0 bg-white border-b border-border py-4 min-h-[4.5rem]">
       <Container>
         <div className="flex items-center gap-0 overflow-x-auto">
           {/* Context */}

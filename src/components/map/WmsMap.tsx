@@ -76,6 +76,8 @@ function WmsLayer({ cqlFilter }: { cqlFilter?: string | null }) {
       ...params,
       tileSize: 512,             // Tiles maiores = menos requests (4x menos que 256)
       detectRetina: false,       // Evita tiles 2x que dobram o tempo de render
+      updateWhenIdle: true,      // Só pede tiles quando o pan termina (reduz carga no GeoServer)
+      updateWhenZooming: false,  // Só atualiza tiles ao fim do zoom (evita muitas requisições durante animação)
     } as L.WMSOptions);
 
     // Tracking de loading

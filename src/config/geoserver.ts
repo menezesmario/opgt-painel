@@ -1,20 +1,24 @@
 /**
  * Configuração de conexão com o GeoServer
  * Dados servidos via WMS/WFS do PostGIS (174.723 polígonos da Malha Fundiária 2025)
+ *
+ * Para testar outra infraestrutura (ex.: servidor em região Brasil), defina no .env.local:
+ *   VITE_GEOSERVER_URL=https://seu-geoserver-brasil.exemplo.com/geoserver
+ * A URL deve terminar em /geoserver (sem barra final). Workspace e camada continuam opgt/wms.
  */
 
-const GEOSERVER_DIRECT = 'https://opgt-geoserver-deploy-production.up.railway.app/geoserver';
+const GEOSERVER_DEFAULT = 'https://opgt-geoserver-deploy-production.up.railway.app/geoserver';
+const GEOSERVER_DIRECT = (import.meta.env.VITE_GEOSERVER_URL ?? GEOSERVER_DEFAULT).replace(/\/$/, '');
 
-// Proxy unificado: Vite proxy em dev, Vercel rewrite em prod
-// Ambos redirecionam /geoserver/* → GeoServer Railway
+// Proxy unificado: Vite proxy em dev, Vercel rewrite em prod (só quando usa URL padrão)
 export const GEOSERVER_BASE = '/geoserver';
 
 // URL direta para tiles WMS (carregados via <img>, não precisa de CORS)
 export const WMS_TILES_URL = `${GEOSERVER_DIRECT}/opgt/wms`;
 
-// URL para fetch (GetFeatureInfo, WFS) — via proxy para evitar CORS
-export const WMS_URL = `${GEOSERVER_BASE}/opgt/wms`;
-export const WFS_URL = `${GEOSERVER_BASE}/opgt/wfs`;
+// URL para fetch (GetFeatureInfo, WFS): com VITE_GEOSERVER_URL usa o mesmo servidor (é preciso CORS no servidor); senão usa proxy
+export const WMS_URL = import.meta.env.VITE_GEOSERVER_URL ? `${GEOSERVER_DIRECT}/opgt/wms` : `${GEOSERVER_BASE}/opgt/wms`;
+export const WFS_URL = import.meta.env.VITE_GEOSERVER_URL ? `${GEOSERVER_DIRECT}/opgt/wfs` : `${GEOSERVER_BASE}/opgt/wfs`;
 
 export const GEOSERVER_LAYERS = {
   malhafundiaria: {

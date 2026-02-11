@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Documentos e assets fora do código (manter local se quiser)
+*.docx
+*.pdf
+Home.jpg
+start.md
+scripts/
+
+# Backups de dados (não versionar)
+src/data/*backup*
+src/data/(backupantigo)*
