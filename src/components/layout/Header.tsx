@@ -21,7 +21,6 @@ const Header: React.FC = () => {
   const navItems = [
     { label: 'Início', href: '/' },
     { label: 'Quem somos', href: '/sobre' },
-    { label: 'Visualização Geo', href: '/visualizacao-geo' },
     { label: 'Dashboard', href: '/dashboard' },
     { label: 'Relatórios', href: '/relatorios' },
     { label: 'Metodologia', href: '/metodologia' },

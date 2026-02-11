@@ -1,4 +1,5 @@
 import React, { useMemo, useState, lazy, Suspense } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Bar,
   BarChart,
@@ -11,25 +12,36 @@ import {
 import Container from '../components/ui/Container';
 import Card from '../components/ui/Card';
 import Tag from '../components/ui/Tag';
-import SectionHeader from '../components/ui/SectionHeader';
 import Disclaimer from '../components/ui/Disclaimer';
 import Skeleton from '../components/ui/Skeleton';
 import ErrorBoundary from '../components/ErrorBoundary';
+import ScopeBar from '../components/geo/ScopeBar';
+import SummaryStrip from '../components/geo/SummaryStrip';
+import FilterDrawer from '../components/geo/FilterDrawer';
+import ActiveFilterChips from '../components/geo/ActiveFilterChips';
+import { useGeoFilters } from '../hooks/useGeoFilters';
 import { MapLegend } from '../components/map/BrasilMap';
 import dashboardDataJson from '../data/dashboardData.json';
-import { 
-  DashboardData, 
-  UF_NAMES, 
-  CAMADAS, 
+import {
+  MALHA_STATS,
+  BIOMA_COLORS,
+  CATEGORIA_FUNDIARIA_COLORS,
+  CATEGORIA_FUNDIARIA_LABELS,
+} from '../config/geoserver';
+import {
+  DashboardData,
+  UF_NAMES,
+  CAMADAS,
   CamadaId,
   AMAZONIA_LEGAL_UFS,
   BRASIL_AREA_HA
 } from '../types/dashboard';
 
-// Lazy loading do mapa (componente pesado que carrega GeoJSON externo)
+// Lazy loading de mapas pesados
 const BrasilMap = lazy(() => import('../components/map/BrasilMap'));
+const WmsMap = lazy(() => import('../components/map/WmsMap'));
 
-type TabId = 'landing' | 'sigef-snci' | 'car' | 'outras-camadas' | 'sobreposicoes' | 'indicadores';
+type TabId = 'landing' | 'mapa-fundiario' | 'sigef-snci' | 'car' | 'outras-camadas' | 'sobreposicoes' | 'indicadores';
 type RegionalView = 'estado' | 'regiao' | 'amazonia-legal';
 
 /**
@@ -43,13 +55,17 @@ const Dashboard: React.FC = () => {
   const [regionalView, setRegionalView] = useState<RegionalView>('estado');
   const [selectedStateUf, setSelectedStateUf] = useState<string | null>(null);
 
-  const tabs: Array<{ id: TabId; label: string }> = [
+  // Hook de filtros geoespaciais (para a aba Mapa Fundiário)
+  const geo = useGeoFilters();
+
+  const tabs: Array<{ id: TabId; label: string; icon?: string }> = [
     { id: 'landing', label: 'Visão Geral' },
+    { id: 'mapa-fundiario', label: 'Mapa Fundiário', icon: '🗺️' },
     { id: 'sigef-snci', label: 'SIGEF/SNCI' },
     { id: 'car', label: 'CAR' },
     { id: 'outras-camadas', label: 'Outras Camadas' },
     { id: 'sobreposicoes', label: 'Operações Compostas' },
-    { id: 'indicadores', label: 'Indicadores' }
+    { id: 'indicadores', label: 'Indicadores' },
   ];
 
   const formatHa = (v: number) =>
@@ -202,43 +218,28 @@ const Dashboard: React.FC = () => {
 
   return (
     <main>
-      {/* Hero */}
-      <section className="bg-gradient-subtle py-20 lg:py-24">
+      {/* Hero — compacto */}
+      <section className="bg-gradient-subtle py-6 lg:py-8">
         <Container>
-          <div className="max-w-4xl">
-            <Tag variant="secondary" className="mb-4">Dashboard de Dados</Tag>
-            <h1 className="text-display-xl text-text mb-6">
-              Dashboard OPGT
-            </h1>
-            <p className="text-body-lg text-text-secondary leading-relaxed">
-              Indicadores fundiários selecionados e tratados para apoiar a compreensão da governança territorial.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <span className="px-3 py-1.5 bg-white rounded text-body-sm text-text-secondary border border-border">
-                <strong className="text-primary">Fonte:</strong> {data.metadata.fonte}
-              </span>
-              <span className="px-3 py-1.5 bg-white rounded text-body-sm text-text-secondary border border-border">
-                <strong className="text-primary">Ano:</strong> {data.metadata.ano_ref}
-              </span>
-              <span className="px-3 py-1.5 bg-white rounded text-body-sm text-text-secondary border border-border">
-                <strong className="text-primary">Atualização:</strong> {data.metadata.atualizacao}
-              </span>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <Tag variant="secondary">Dashboard de Dados</Tag>
+                <span className="text-body-xs text-text-muted hidden sm:inline">
+                  {data.metadata.fonte} · {data.metadata.ano_ref} · Atualizado em {data.metadata.atualizacao}
+                </span>
+              </div>
+              <h1 className="text-display-lg text-text">Dashboard OPGT</h1>
             </div>
           </div>
         </Container>
       </section>
 
       {/* Dashboard Content */}
-      <section className="section-padding bg-bg-alt">
+      <section className="py-6 bg-bg-alt">
         <Container>
-          <SectionHeader
-            label="Explorar"
-            title="Dashboard Interativo"
-            description={data.metadata.nota}
-          />
-
           {/* Tab Navigation */}
-          <div className="flex flex-wrap gap-2 mb-8">
+          <div className="flex flex-wrap gap-2 mb-6">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -247,22 +248,139 @@ const Dashboard: React.FC = () => {
                   if (tab.id !== 'landing') setSelectedLayer(null);
                 }}
                 className={`
-                  px-6 py-3 rounded-lg text-body-md font-medium
+                  px-5 py-2.5 rounded-lg text-body-sm font-medium
                   transition-all duration-200
                   ${activeTab === tab.id
                     ? 'bg-primary text-white'
-                    : 'bg-white text-text-secondary hover:bg-primary/5 hover:text-primary'
+                    : 'bg-white text-text-secondary hover:bg-primary/5 hover:text-primary border border-border'
                   }
                 `}
               >
+                {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
                 {tab.label}
               </button>
             ))}
           </div>
 
-          {/* Tab Content */}
+          {/* Mapa Fundiário — renderizado fora do card branco (precisa de full-width interno) */}
+          {activeTab === 'mapa-fundiario' && (
+            <div className="space-y-0">
+              {/* Scope Bar */}
+              <ScopeBar
+                selectedRegiao={geo.state.selectedRegiao}
+                selectedEstado={geo.state.selectedEstado}
+                onRegiaoChange={(regiao) => geo.dispatch({ type: 'SET_REGIAO', regiao })}
+                onEstadoChange={(estado) => geo.dispatch({ type: 'SET_ESTADO', estado })}
+                onResetToBrasil={() => geo.dispatch({ type: 'RESET_TO_BRASIL' })}
+                onOpenDrawer={() => geo.dispatch({ type: 'TOGGLE_DRAWER' })}
+                activeFilterCount={geo.activeFilterCount}
+              />
+
+              {/* Summary Strip */}
+              <SummaryStrip
+                scopeLabel={geo.scopeLabel}
+                scopeSublabel={geo.scopeSublabel}
+                registros={MALHA_STATS.total.registros}
+                area_ha={MALHA_STATS.total.area_ha}
+                biomaCount={MALHA_STATS.por_bioma.length}
+                categoriaCount={MALHA_STATS.por_categoria.length}
+              />
+
+              {/* Mapa */}
+              <div className="mt-4 relative bg-white border border-border rounded-lg overflow-hidden shadow-card">
+                <ActiveFilterChips
+                  selectedBiomas={geo.state.selectedBiomas}
+                  selectedCategoria={geo.state.selectedCategoria}
+                  onRemoveBioma={(bioma) => geo.dispatch({ type: 'REMOVE_BIOMA', bioma })}
+                  onRemoveCategoria={() => geo.dispatch({ type: 'REMOVE_CATEGORIA' })}
+                />
+                <ErrorBoundary fallback={<div className="h-[65vh] flex items-center justify-center text-text-muted">Erro ao carregar mapa</div>}>
+                  <Suspense fallback={<Skeleton variant="map" className="h-[65vh]" />}>
+                    <WmsMap
+                      cqlFilter={geo.cqlFilter}
+                      onFeatureClick={(props) => geo.dispatch({ type: 'SET_FEATURE', feature: props })}
+                      bounds={geo.bounds}
+                      minHeight="65vh"
+                    />
+                  </Suspense>
+                </ErrorBoundary>
+              </div>
+
+              {/* Detalhes do polígono clicado */}
+              {geo.state.clickedFeature && (
+                <div className="mt-4 p-4 bg-white rounded-lg border border-border shadow-card">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-body-md font-semibold text-text">Detalhes do Polígono</h4>
+                    <button
+                      onClick={() => geo.dispatch({ type: 'SET_FEATURE', feature: null })}
+                      className="text-body-xs text-text-muted hover:text-text transition-colors"
+                    >
+                      Fechar
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {geo.state.clickedFeature.bioma != null && (
+                      <div>
+                        <div className="text-body-xs text-text-muted uppercase">Bioma</div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: BIOMA_COLORS[String(geo.state.clickedFeature.bioma)] || '#999' }} />
+                          <span className="text-body-sm font-medium text-text">{String(geo.state.clickedFeature.bioma)}</span>
+                        </div>
+                      </div>
+                    )}
+                    {geo.state.clickedFeature.categoria_fundiaria_v2025 != null && (() => {
+                      const cat = String(geo.state.clickedFeature.categoria_fundiaria_v2025);
+                      return (
+                        <div>
+                          <div className="text-body-xs text-text-muted uppercase">Cat. Fundiária</div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: CATEGORIA_FUNDIARIA_COLORS[cat] || '#999' }} />
+                            <span className="text-body-sm font-medium text-text">{cat} — {CATEGORIA_FUNDIARIA_LABELS[cat] || ''}</span>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                    {geo.state.clickedFeature.cd_mun != null && (
+                      <div>
+                        <div className="text-body-xs text-text-muted uppercase">Cód. Município</div>
+                        <div className="text-body-sm text-text mt-1">{String(geo.state.clickedFeature.cd_mun)}</div>
+                      </div>
+                    )}
+                    {geo.state.clickedFeature.area_ha != null && (
+                      <div>
+                        <div className="text-body-xs text-text-muted uppercase">Área</div>
+                        <div className="text-body-sm font-semibold text-primary mt-1">{formatHa(Number(geo.state.clickedFeature.area_ha))}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Fonte */}
+              <div className="mt-3 flex items-center justify-between px-4 py-3 bg-white border border-border rounded-md text-[0.78rem] text-text-muted">
+                <span>Dados: Malha Fundiária 2025 (iGPP/OPGT) · 174.723 polígonos · Atualização semestral</span>
+                <Link to="/metodologia" className="text-primary font-semibold hover:underline hidden sm:inline">
+                  Consultar Metodologia ›
+                </Link>
+              </div>
+
+              {/* Filter Drawer */}
+              <FilterDrawer
+                isOpen={geo.state.isDrawerOpen}
+                onClose={() => geo.dispatch({ type: 'CLOSE_DRAWER' })}
+                onApply={(biomas, categoria) =>
+                  geo.dispatch({ type: 'APPLY_DRAWER_FILTERS', biomas, categoria })
+                }
+                initialBiomas={geo.state.selectedBiomas}
+                initialCategoria={geo.state.selectedCategoria}
+              />
+            </div>
+          )}
+
+          {/* Tab Content — demais abas */}
+          {activeTab !== 'mapa-fundiario' && (
           <div className="bg-white rounded-xl border border-border p-6 md:p-8 min-h-[400px]">
-            
+
             {/* LANDING - Cards Brasil por camada */}
             {activeTab === 'landing' && !selectedLayer && (
               <div className="space-y-8">
@@ -857,11 +975,12 @@ const Dashboard: React.FC = () => {
               </div>
             )}
           </div>
+          )}
 
           {/* Disclaimer */}
-          <Disclaimer 
+          <Disclaimer
             text={data.metadata.disclaimer}
-            className="mt-8"
+            className="mt-6"
           />
         </Container>
       </section>
