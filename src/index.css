@@ -328,6 +328,21 @@
 .animate-metric:nth-child(4) { animation-delay: 180ms; }
 .animate-metric:nth-child(5) { animation-delay: 240ms; }
 
+/* Expand/collapse fluido (grid 0fr → 1fr); sem scroll horizontal durante a animação */
+.collapse-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease-out;
+  overflow-x: hidden;
+}
+.collapse-panel.is-open {
+  grid-template-rows: 1fr;
+}
+.collapse-panel-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
 /* Selection colors */
 ::selection {
   @apply bg-primary/20 text-text;

@@ -53,6 +53,8 @@ const Dashboard: React.FC = () => {
   const [selectedLayer, setSelectedLayer] = useState<CamadaId | null>(null);
   const [regionalView, setRegionalView] = useState<RegionalView>('estado');
   const [selectedStateUf, setSelectedStateUf] = useState<string | null>(null);
+  /** Resumo do escopo (aba Mapa Fundiário): colapsável para ganhar espaço. */
+  const [resumoCollapsed, setResumoCollapsed] = useState(false);
 
   // Hook de filtros geoespaciais (para a aba Mapa Fundiário)
   const geo = useGeoFilters();
@@ -296,10 +298,15 @@ const Dashboard: React.FC = () => {
                   activeFilterCount={geo.activeFilterCount}
                   sticky={false}
                 />
-                {/* Resumo — inline para garantir exibição (mesmo conteúdo do SummaryStrip) */}
-                <div className="flex-shrink-0 bg-white border-b border-border py-4 min-h-[4.5rem]" role="region" aria-label="Resumo do escopo">
+                {/* Resumo — colapsável com animação fluida (CSS grid); dados de referência: totais Brasil */}
+                <div className="flex-shrink-0 bg-white border-b border-border" role="region" aria-label="Resumo do escopo">
                   <Container>
-                    <div className="flex items-center gap-0 overflow-x-auto flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => setResumoCollapsed((c) => !c)}
+                      className="w-full flex items-center gap-0 overflow-x-hidden flex-wrap py-3 min-h-[3.25rem] text-left hover:bg-gray-50/80 transition-colors duration-200 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      aria-expanded={!resumoCollapsed}
+                    >
                       <div className="flex items-center gap-2.5 pr-5 border-r border-border mr-5 min-w-fit">
                         <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 text-lg">
                           {geo.scopeLabel === 'Brasil' ? '🇧🇷' : ['Norte', 'Nordeste', 'Centro-Oeste', 'Sudeste', 'Sul'].includes(geo.scopeLabel) ? '🗺️' : '📍'}
@@ -311,30 +318,46 @@ const Dashboard: React.FC = () => {
                           <span className="text-[0.72rem] text-text-muted font-medium">{geo.scopeSublabel}</span>
                         </div>
                       </div>
-                      <div className="flex gap-0 flex-1 flex-wrap">
-                        <div className="px-5 border-r border-border last:border-r-0 min-w-fit">
-                          <div className="text-xl font-bold leading-tight tracking-tight text-primary">
-                            {new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(MALHA_STATS.total.registros)}
+                      <span
+                        className={`text-text-muted ml-auto flex-shrink-0 transition-transform duration-200 ease-out`}
+                        aria-hidden
+                        style={{ transform: resumoCollapsed ? 'rotate(0deg)' : 'rotate(180deg)' }}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                      </span>
+                    </button>
+                    <div className={`collapse-panel ${!resumoCollapsed ? 'is-open' : ''}`}>
+                      <div className="collapse-panel-inner">
+                        <div className="flex items-center gap-0 overflow-x-hidden flex-wrap pb-4 pt-0">
+                          <span className="text-[0.7rem] font-medium text-text-muted uppercase tracking-wider mr-4 flex-shrink-0 self-center">
+                            Totais Brasil
+                          </span>
+                          <div className="flex gap-0 flex-1 flex-wrap">
+                            <div className="px-5 border-r border-border last:border-r-0 min-w-fit">
+                              <div className="text-xl font-bold leading-tight tracking-tight text-primary">
+                                {new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(MALHA_STATS.total.registros)}
+                              </div>
+                              <div className="text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-text-muted mt-0.5">Polígonos</div>
+                            </div>
+                            <div className="px-5 border-r border-border last:border-r-0 min-w-fit">
+                              <div className="text-xl font-bold leading-tight tracking-tight text-primary">
+                                {MALHA_STATS.total.area_ha >= 1_000_000
+                                  ? `${(MALHA_STATS.total.area_ha / 1_000_000).toFixed(0)} M ha`
+                                  : MALHA_STATS.total.area_ha >= 1_000
+                                    ? `${(MALHA_STATS.total.area_ha / 1_000).toFixed(0)} mil ha`
+                                    : `${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(MALHA_STATS.total.area_ha)} ha`}
+                              </div>
+                              <div className="text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-text-muted mt-0.5">Área Total</div>
+                            </div>
+                            <div className="px-5 border-r border-border last:border-r-0 min-w-fit">
+                              <div className="text-xl font-bold leading-tight tracking-tight text-primary">{MALHA_STATS.por_bioma.length}</div>
+                              <div className="text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-text-muted mt-0.5">Biomas</div>
+                            </div>
+                            <div className="px-5 border-r border-border last:border-r-0 min-w-fit">
+                              <div className="text-xl font-bold leading-tight tracking-tight text-primary">{MALHA_STATS.por_categoria.length}</div>
+                              <div className="text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-text-muted mt-0.5">Categorias</div>
+                            </div>
                           </div>
-                          <div className="text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-text-muted mt-0.5">Polígonos</div>
-                        </div>
-                        <div className="px-5 border-r border-border last:border-r-0 min-w-fit">
-                          <div className="text-xl font-bold leading-tight tracking-tight text-primary">
-                            {MALHA_STATS.total.area_ha >= 1_000_000
-                              ? `${(MALHA_STATS.total.area_ha / 1_000_000).toFixed(0)} M ha`
-                              : MALHA_STATS.total.area_ha >= 1_000
-                                ? `${(MALHA_STATS.total.area_ha / 1_000).toFixed(0)} mil ha`
-                                : `${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 }).format(MALHA_STATS.total.area_ha)} ha`}
-                          </div>
-                          <div className="text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-text-muted mt-0.5">Área Total</div>
-                        </div>
-                        <div className="px-5 border-r border-border last:border-r-0 min-w-fit">
-                          <div className="text-xl font-bold leading-tight tracking-tight text-primary">{MALHA_STATS.por_bioma.length}</div>
-                          <div className="text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-text-muted mt-0.5">Biomas</div>
-                        </div>
-                        <div className="px-5 border-r border-border last:border-r-0 min-w-fit">
-                          <div className="text-xl font-bold leading-tight tracking-tight text-primary">{MALHA_STATS.por_categoria.length}</div>
-                          <div className="text-[0.68rem] font-semibold uppercase tracking-[0.04em] text-text-muted mt-0.5">Categorias</div>
                         </div>
                       </div>
                     </div>
