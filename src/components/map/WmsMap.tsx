@@ -549,6 +549,93 @@ function GradualWmsLayers({ scopeOnlyCql }: { scopeOnlyCql: string | null }) {
   );
 }
 
+/** URL do GeoJSON de limites dos estados (mesma fonte do BrasilMap). */
+const BRAZIL_STATES_GEOJSON_URL = 'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson';
+
+/** Zoom a partir do qual os nomes dos estados são exibidos. */
+const MIN_ZOOM_STATE_LABELS = 4;
+
+/**
+ * Camada de recorte: limites dos estados com nomes conforme o zoom.
+ * Linhas separando cada estado; rótulos (nome/UF) visíveis a partir de MIN_ZOOM_STATE_LABELS.
+ */
+function StatesBoundariesLayer() {
+  const map = useMap();
+  const boundariesRef = useRef<L.Layer | null>(null);
+  const labelsRef = useRef<L.LayerGroup | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch(BRAZIL_STATES_GEOJSON_URL)
+      .then((res) => res.json())
+      .then((geojson: GeoJSON.GeoJSON) => {
+        if (cancelled || !map) return;
+
+        const style: L.PathOptions = {
+          color: '#5a7a63',
+          weight: 1.2,
+          fillOpacity: 0,
+          opacity: 0.9,
+        };
+
+        const labelGroup = L.layerGroup();
+        labelsRef.current = labelGroup;
+        if (map.getZoom() >= MIN_ZOOM_STATE_LABELS) labelGroup.addTo(map);
+
+        const boundariesLayer = L.geoJSON(geojson as GeoJSON.GeoJsonObject, {
+          style: () => style,
+          onEachFeature: (feature, layer) => {
+            const props = feature.properties as Record<string, string> | undefined;
+            const name = props?.name || props?.Nome || props?.sigla || props?.id || '';
+            if (!name) return;
+            const bounds = layer.getBounds();
+            const center = bounds.getCenter();
+            const marker = L.marker(center, {
+              icon: L.divIcon({
+                html: `<span style="
+                  font-size: 11px;
+                  font-weight: 600;
+                  color: #2F4636;
+                  text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 1px 2px rgba(0,0,0,0.1);
+                  white-space: nowrap;
+                  pointer-events: none;
+                ">${name}</span>`,
+                className: 'boundary-label',
+                iconSize: undefined,
+                iconAnchor: undefined,
+              }),
+            });
+            labelGroup.addLayer(marker);
+          },
+        });
+        boundariesLayer.addTo(map);
+        boundariesRef.current = boundariesLayer;
+      })
+      .catch((err) => console.warn('States boundaries GeoJSON:', err));
+
+    return () => {
+      cancelled = true;
+      boundariesRef.current?.remove();
+      boundariesRef.current = null;
+      labelsRef.current?.remove();
+      labelsRef.current = null;
+    };
+  }, [map]);
+
+  useEffect(() => {
+    const onZoom = () => {
+      const show = map.getZoom() >= MIN_ZOOM_STATE_LABELS;
+      if (show) labelsRef.current?.addTo(map);
+      else labelsRef.current?.remove();
+    };
+    map.on('zoomend', onZoom);
+    return () => map.off('zoomend', onZoom);
+  }, [map]);
+
+  return null;
+}
+
 /** Overlay quando não há escopo (região/estado): evita carregar WMS do Brasil inteiro. */
 function WmsScopeRequiredOverlay() {
   return (
@@ -685,6 +772,9 @@ const WmsMap: React.FC<WmsMapProps> = ({
         ) : (
           <WmsScopeRequiredOverlay />
         )}
+
+        {/* Recorte de estados: linhas e nomes conforme zoom */}
+        <StatesBoundariesLayer />
 
         {/* Popup com detalhes do polígono */}
         {popup && (
