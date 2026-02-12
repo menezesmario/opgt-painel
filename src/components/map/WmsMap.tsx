@@ -589,7 +589,7 @@ function StatesBoundariesLayer() {
             const props = feature.properties as Record<string, string> | undefined;
             const name = props?.name || props?.Nome || props?.sigla || props?.id || '';
             if (!name) return;
-            const bounds = layer.getBounds();
+            const bounds = (layer as L.Polygon).getBounds();
             const center = bounds.getCenter();
             const marker = L.marker(center, {
               icon: L.divIcon({
@@ -630,7 +630,9 @@ function StatesBoundariesLayer() {
       else labelsRef.current?.remove();
     };
     map.on('zoomend', onZoom);
-    return () => map.off('zoomend', onZoom);
+    return () => {
+      map.off('zoomend', onZoom);
+    };
   }, [map]);
 
   return null;
