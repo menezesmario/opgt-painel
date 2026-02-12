@@ -38,7 +38,6 @@ const VisualizacaoGeo: React.FC = () => {
     scopeLabel,
     scopeSublabel,
     bounds,
-    hasScope,
   } = useGeoFilters();
 
   const { clickedFeature } = state;
