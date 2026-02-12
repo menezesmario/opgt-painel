@@ -14,7 +14,11 @@ const GEOSERVER_DIRECT = (import.meta.env.VITE_GEOSERVER_URL ?? GEOSERVER_DEFAUL
 export const GEOSERVER_BASE = '/geoserver';
 
 // URL direta para tiles WMS (carregados via <img>, não precisa de CORS)
-export const WMS_TILES_URL = `${GEOSERVER_DIRECT}/opgt/wms`;
+// Usar GeoWebCache se habilitado (padrão: false até GWC ser configurado no GeoServer)
+const USE_GEOWEBCACHE = import.meta.env.VITE_USE_GEOWEBCACHE === 'true';
+export const WMS_TILES_URL = USE_GEOWEBCACHE
+  ? `${GEOSERVER_DIRECT}/gwc/service/wms`
+  : `${GEOSERVER_DIRECT}/opgt/wms`;
 
 // URL para fetch (GetFeatureInfo, WFS): com VITE_GEOSERVER_URL usa o mesmo servidor (é preciso CORS no servidor); senão usa proxy
 export const WMS_URL = import.meta.env.VITE_GEOSERVER_URL ? `${GEOSERVER_DIRECT}/opgt/wms` : `${GEOSERVER_BASE}/opgt/wms`;
