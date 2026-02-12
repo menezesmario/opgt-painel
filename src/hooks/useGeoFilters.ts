@@ -12,14 +12,17 @@ export interface GeoFilterState {
   clickedFeature: Record<string, unknown> | null;
 }
 
-/** Região padrão na abertura do mapa: primeiro carregamento fica limitado a uma região (mais leve que Brasil inteiro). */
-const DEFAULT_REGIAO = 'Sudeste';
+/** Escopo padrão: Brasil (sem região/estado). */
+const DEFAULT_REGIAO = '';
+
+/** Categoria padrão na abertura: uma única camada para o Brasil = propriedades privadas (IRP / Imóvel Rural Particular — SIGEF/SNCI). */
+const DEFAULT_CATEGORIA_BRASIL = 'IRP';
 
 const initialState: GeoFilterState = {
   selectedRegiao: DEFAULT_REGIAO,
   selectedEstado: '',
   selectedBiomas: [],
-  selectedCategoria: '',
+  selectedCategoria: DEFAULT_CATEGORIA_BRASIL,
   isDrawerOpen: false,
   clickedFeature: null,
 };
