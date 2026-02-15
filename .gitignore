@@ -33,3 +33,4 @@ scripts/
 # Backups de dados (não versionar)
 src/data/*backup*
 src/data/(backupantigo)*
+migration-backup/

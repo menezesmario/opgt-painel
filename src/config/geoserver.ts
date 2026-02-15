@@ -7,26 +7,28 @@
  * A URL deve terminar em /geoserver (sem barra final). Workspace e camada continuam opgt/wms.
  */
 
-const GEOSERVER_DEFAULT = 'https://opgt-geoserver-deploy-production.up.railway.app/geoserver';
-const GEOSERVER_DIRECT = (import.meta.env.VITE_GEOSERVER_URL ?? GEOSERVER_DEFAULT).replace(/\/$/, '');
+const GEOSERVER_DEFAULT = 'http://216.238.123.122/geoserver';
+const isDev = import.meta.env.DEV;
 
-// Proxy unificado: Vite proxy em dev, Vercel rewrite em prod (só quando usa URL padrão)
+// Em dev usa /geoserver (proxy do Vite); em prod usa URL do env ou Vultr
+const GEOSERVER_BASE_URL = isDev
+  ? '/geoserver'
+  : (import.meta.env.VITE_GEOSERVER_URL ?? GEOSERVER_DEFAULT).replace(/\/$/, '');
+
 export const GEOSERVER_BASE = '/geoserver';
 
-// URL direta para tiles WMS (carregados via <img>, não precisa de CORS)
-// Usar GeoWebCache se habilitado (padrão: false até GWC ser configurado no GeoServer)
+// Tiles WMS e endpoints: em dev passam pelo proxy (sem CORS)
 const USE_GEOWEBCACHE = import.meta.env.VITE_USE_GEOWEBCACHE === 'true';
 export const WMS_TILES_URL = USE_GEOWEBCACHE
-  ? `${GEOSERVER_DIRECT}/gwc/service/wms`
-  : `${GEOSERVER_DIRECT}/opgt/wms`;
+  ? `${GEOSERVER_BASE_URL}/gwc/service/wms`
+  : `${GEOSERVER_BASE_URL}/opgt/wms`;
 
-// URL para fetch (GetFeatureInfo, WFS): com VITE_GEOSERVER_URL usa o mesmo servidor (é preciso CORS no servidor); senão usa proxy
-export const WMS_URL = import.meta.env.VITE_GEOSERVER_URL ? `${GEOSERVER_DIRECT}/opgt/wms` : `${GEOSERVER_BASE}/opgt/wms`;
-export const WFS_URL = import.meta.env.VITE_GEOSERVER_URL ? `${GEOSERVER_DIRECT}/opgt/wfs` : `${GEOSERVER_BASE}/opgt/wfs`;
+export const WMS_URL = `${GEOSERVER_BASE_URL}/opgt/wms`;
+export const WFS_URL = `${GEOSERVER_BASE_URL}/opgt/wfs`;
 
 export const GEOSERVER_LAYERS = {
   malhafundiaria: {
-    name: 'opgt:malhafundiaria_postgis',
+    name: 'opgt:pa_br_malhafundiaria_2025_cdt',
     title: 'Malha Fundiária 2025',
     nativeName: 'pa_br_malhafundiaria_2025_cdt',
     srs: 'EPSG:4674',

@@ -6,7 +6,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd">
   <NamedLayer>
-    <Name>opgt:malhafundiaria_postgis</Name>
+    <Name>opgt:pa_br_malhafundiaria_2025_cdt</Name>
     <UserStyle>
       <Title>Malha Fundiaria por Categoria</Title>
       <FeatureTypeStyle>

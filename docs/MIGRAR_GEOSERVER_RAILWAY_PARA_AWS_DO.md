@@ -22,7 +22,7 @@ Para ter uma “cópia” na AWS ou Digital Ocean você precisa replicar os dois
 | **Acesso ao projeto no Railway** (dashboard) | Ver serviços (GeoServer e PostGIS), variáveis de ambiente, portas. |
 | **Connection string do PostGIS** | Host, porta, usuário, senha, nome do banco. Fica em “Variables” do serviço PostGIS no Railway. Formato típico: `postgresql://user:password@host:port/dbname`. |
 | **Como o GeoServer está rodando** | Se é Docker, build do repositório, ou imagem. No Railway: aba “Settings” ou “Deploy” do serviço GeoServer. |
-| **Configuração do GeoServer** (opcional mas útil) | Workspace `opgt`, store PostGIS, camada `malhafundiaria_postgis`, estilos (ex.: `malha_categorias`). Pode ser exportada via interface do GeoServer (Data / Layer / Style) ou por backup de diretório de dados. |
+| **Configuração do GeoServer** (opcional mas útil) | Workspace `opgt`, store PostGIS, camada `pa_br_malhafundiaria_2025_cdt`, estilos (ex.: `malha_categorias`). Pode ser exportada via interface do GeoServer (Data / Layer / Style) ou por backup de diretório de dados. |
 
 Sem a connection string do PostGIS você não consegue fazer dump do banco. Sem saber como o GeoServer está deployado (Docker, etc.), fica mais difícil replicar exatamente.
 

@@ -1,0 +1,95 @@
+# Docker Compose otimizado para Vultr São Paulo
+# Uso: docker-compose -f docker-compose.vultr.yml up -d
+
+version: '3.8'
+
+services:
+  postgis:
+    image: postgis/postgis:16-3.4
+    container_name: opgt-postgis
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: opgt_geodata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_SHARED_BUFFERS: 512MB
+      POSTGRES_EFFECTIVE_CACHE_SIZE: 1536MB
+      POSTGRES_WORK_MEM: 16MB
+      POSTGRES_MAINTENANCE_WORK_MEM: 256MB
+      POSTGRES_RANDOM_PAGE_COST: 1.1
+    volumes:
+      - postgis-data:/var/lib/postgresql/data
+      - ./backups:/backups
+    ports:
+      - "5432:5432"
+    networks:
+      - opgt-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  geoserver:
+    image: kartoza/geoserver:2.24.0
+    container_name: opgt-geoserver
+    restart: unless-stopped
+    environment:
+      GEOSERVER_ADMIN_USER: admin
+      GEOSERVER_ADMIN_PASSWORD: ${GEOSERVER_ADMIN_PASSWORD}
+      GEOSERVER_DATA_DIR: /opt/geoserver/data_dir
+      INITIAL_MEMORY: 1536M
+      MAXIMUM_MEMORY: 3072M
+      JAVA_OPTS: >-
+        -Xms1536m -Xmx3072m
+        -XX:+UseG1GC
+        -XX:SoftRefLRUPolicyMSPerMB=36000
+        -Dsun.java2d.renderer=org.marlin.pisces.MarlinRenderingEngine
+        -Dorg.geotools.coverage.jaiext.enabled=true
+      STABLE_EXTENSIONS: ""
+      COMMUNITY_EXTENSIONS: ""
+    volumes:
+      - geoserver-data:/opt/geoserver/data_dir
+      - geoserver-cache:/opt/geoserver/data_dir/gwc
+    ports:
+      - "8080:8080"
+    networks:
+      - opgt-network
+    depends_on:
+      postgis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/geoserver/web/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  nginx:
+    image: nginx:alpine
+    container_name: opgt-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx-cache:/var/cache/nginx
+    networks:
+      - opgt-network
+    depends_on:
+      - geoserver
+
+volumes:
+  postgis-data:
+    driver: local
+  geoserver-data:
+    driver: local
+  geoserver-cache:
+    driver: local
+  nginx-cache:
+    driver: local
+
+networks:
+  opgt-network:
+    driver: bridge

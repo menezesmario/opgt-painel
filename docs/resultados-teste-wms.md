@@ -21,19 +21,19 @@ Use a URL abaixo para medir tempo de um GetMap com **curl** (sem filtro CQL). BB
 **URL GetMap (um tile, sem CQL):**
 
 ```
-https://opgt-geoserver-deploy-production.up.railway.app/geoserver/opgt/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=opgt%3Amalhafundiaria_postgis&SRS=EPSG%3A4326&BBOX=-74,-34,-35,5&WIDTH=512&HEIGHT=512&FORMAT=image%2Fpng8&TRANSPARENT=true
+https://opgt-geoserver-deploy-production.up.railway.app/geoserver/opgt/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=opgt%3Apa_br_malhafundiaria_2025_cdt&SRS=EPSG%3A4326&BBOX=-74,-34,-35,5&WIDTH=512&HEIGHT=512&FORMAT=image%2Fpng8&TRANSPARENT=true
 ```
 
 **Exemplo de comando curl (PowerShell):**
 
 ```powershell
-curl -o NUL -w "Total: %{time_total}s | TTFB: %{time_starttransfer}s`n" "https://opgt-geoserver-deploy-production.up.railway.app/geoserver/opgt/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=opgt%3Amalhafundiaria_postgis&SRS=EPSG%3A4326&BBOX=-74,-34,-35,5&WIDTH=512&HEIGHT=512&FORMAT=image%2Fpng8&TRANSPARENT=true"
+curl -o NUL -w "Total: %{time_total}s | TTFB: %{time_starttransfer}s`n" "https://opgt-geoserver-deploy-production.up.railway.app/geoserver/opgt/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=opgt%3Apa_br_malhafundiaria_2025_cdt&SRS=EPSG%3A4326&BBOX=-74,-34,-35,5&WIDTH=512&HEIGHT=512&FORMAT=image%2Fpng8&TRANSPARENT=true"
 ```
 
 **Exemplo em bash (Linux/macOS):**
 
 ```bash
-curl -o /dev/null -w "Total: %{time_total}s | TTFB: %{time_starttransfer}s\n" "https://opgt-geoserver-deploy-production.up.railway.app/geoserver/opgt/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=opgt%3Amalhafundiaria_postgis&SRS=EPSG%3A4326&BBOX=-74,-34,-35,5&WIDTH=512&HEIGHT=512&FORMAT=image%2Fpng8&TRANSPARENT=true"
+curl -o /dev/null -w "Total: %{time_total}s | TTFB: %{time_starttransfer}s\n" "https://opgt-geoserver-deploy-production.up.railway.app/geoserver/opgt/wms?SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&LAYERS=opgt%3Apa_br_malhafundiaria_2025_cdt&SRS=EPSG%3A4326&BBOX=-74,-34,-35,5&WIDTH=512&HEIGHT=512&FORMAT=image%2Fpng8&TRANSPARENT=true"
 ```
 
 **Ping (latência de rede):**
