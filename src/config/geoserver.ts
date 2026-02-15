@@ -7,13 +7,9 @@
  * A URL deve terminar em /geoserver (sem barra final). Workspace e camada continuam opgt/wms.
  */
 
-const GEOSERVER_DEFAULT = 'http://216.238.123.122/geoserver';
-const isDev = import.meta.env.DEV;
-
-// Em dev usa /geoserver (proxy do Vite); em prod usa URL do env ou Vultr
-const GEOSERVER_BASE_URL = isDev
-  ? '/geoserver'
-  : (import.meta.env.VITE_GEOSERVER_URL ?? GEOSERVER_DEFAULT).replace(/\/$/, '');
+// Sempre mesma origem: evita CORS e mixed content (HTTPS página não pode carregar HTTP)
+const GEOSERVER_BASE_URL =
+  typeof window !== 'undefined' ? `${window.location.origin}/geoserver` : '/geoserver';
 
 export const GEOSERVER_BASE = '/geoserver';
 
